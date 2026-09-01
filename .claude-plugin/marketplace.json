@@ -1,15 +1,25 @@
 {
-  "name": "claude-plugin-visuals",
+  "name": "visuals-skills",
+  "description": "Visual-deliverable skills — HTML decks, dashboards and infographics, Markdown-to-scroll-deck conversion, and Excalidraw architecture diagrams",
   "owner": {
     "name": "dEitY719",
     "url": "https://github.com/dEitY719"
   },
-  "description": "A curated Claude Code skills marketplace maintained by dEitY719. Each plugin is an independently installable skill.",
   "plugins": [
     {
       "name": "visuals",
-      "source": "./plugins/visuals",
-      "description": "HTML visualizations (slides, infographics, dashboards, one-pagers) plus Excalidraw architecture/concept diagrams. Bundles the 'visualize' and 'excalidraw-diagram' skills."
+      "description": "Turn any content into a visual deliverable: self-contained HTML decks, dashboards, infographics and posters; vertical scroll-snap decks built from a Markdown file; and Excalidraw architecture and concept diagrams. Bundles the 'visualize', 'md-to-scrolldeck', and 'excalidraw-diagram' skills.",
+      "version": "0.5.0",
+      "source": "./",
+      "author": {
+        "name": "careerhackeralex / coleam00",
+        "note": "Original skill authors — visualize by careerhackeralex, excalidraw-diagram by coleam00, md-to-scrolldeck by dEitY719"
+      },
+      "maintainer": {
+        "name": "dEitY719",
+        "url": "https://github.com/dEitY719"
+      },
+      "license": "MIT"
     }
   ]
 }

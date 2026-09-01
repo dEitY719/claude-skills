@@ -1,0 +1,49 @@
+{
+  "name": "visuals",
+  "version": "0.5.0",
+  "description": "Turn any content into a visual deliverable: self-contained HTML decks, dashboards, infographics and posters; vertical scroll-snap decks built from a Markdown file; and Excalidraw architecture and concept diagrams.",
+  "author": {
+    "name": "careerhackeralex / coleam00",
+    "note": "Original skill authors — visualize by careerhackeralex, excalidraw-diagram by coleam00, md-to-scrolldeck by dEitY719"
+  },
+  "maintainer": {
+    "name": "dEitY719",
+    "url": "https://github.com/dEitY719"
+  },
+  "homepage": "https://github.com/dEitY719/visuals-skills",
+  "repository": "https://github.com/dEitY719/visuals-skills",
+  "license": "MIT",
+  "keywords": [
+    "visualization",
+    "html",
+    "slides",
+    "dashboard",
+    "infographic",
+    "presentation",
+    "scrollytelling",
+    "excalidraw",
+    "diagram",
+    "architecture-diagram"
+  ],
+  "skills": "./skills/",
+  "hooks": {},
+  "interface": {
+    "displayName": "Visuals",
+    "shortDescription": "HTML decks, scroll decks, and Excalidraw diagrams from any content",
+    "longDescription": "Visuals bundles the three skills that turn content into something you can show: visualize writes a single self-contained HTML file — deck, dashboard, infographic, poster, timeline — from a skeleton and a design system; md-to-scrolldeck compresses a Markdown report into a vertical scroll-snap deck for leadership review; excalidraw-diagram generates .excalidraw JSON that argues visually, then renders it to PNG and audits its own output before delivering.",
+    "developerName": "dEitY719",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Visualize this as an HTML dashboard.",
+      "Turn docs/report.md into a scroll deck."
+    ],
+    "websiteURL": "https://github.com/dEitY719/visuals-skills",
+    "brandColor": "#7C3AED",
+    "screenshots": []
+  }
+}

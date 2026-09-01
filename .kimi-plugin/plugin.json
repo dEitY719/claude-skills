@@ -1,0 +1,41 @@
+{
+  "name": "visuals",
+  "version": "0.5.0",
+  "description": "HTML decks, dashboards, infographics, Markdown-to-scroll-decks, and Excalidraw architecture diagrams from any content.",
+  "author": {
+    "name": "careerhackeralex / coleam00",
+    "note": "Original skill authors — visualize by careerhackeralex, excalidraw-diagram by coleam00, md-to-scrolldeck by dEitY719"
+  },
+  "maintainer": {
+    "name": "dEitY719",
+    "url": "https://github.com/dEitY719"
+  },
+  "homepage": "https://github.com/dEitY719/visuals-skills",
+  "license": "MIT",
+  "keywords": [
+    "visualization",
+    "html",
+    "slides",
+    "dashboard",
+    "infographic",
+    "presentation",
+    "scrollytelling",
+    "excalidraw",
+    "diagram",
+    "architecture-diagram"
+  ],
+  "skills": "./skills/",
+  "skillInstructions": "Kimi Code tool mapping for the visuals skills.\n\nThe authoritative mapping lives in the sibling repo `dEitY719/harness-skills` at `references/kimi-tools.md` (https://github.com/dEitY719/harness-skills/blob/main/references/kimi-tools.md) — read it when a skill names a tool you do not recognise. It is the single source of truth for every repo in the `dEitY719/*-skills` family; do not copy it into this repo. Summary:\n\n- Read / Write / Edit / Bash / Grep / Glob keep their exposed Kimi names. Search contents with `Grep`; match paths with `Glob`.\n- `TodoWrite` -> Kimi Code's `TodoList` tool.\n- \"Ask the user\" -> `AskUserQuestion`. `visuals:visualize` uses it for the Auto-Recommend step (propose one or two formats, wait for the answer), and `visuals:md-to-scrolldeck` uses it when a document yields fewer than 5 beats or more than 20.\n- \"Dispatch a subagent\" -> `Agent` with `subagent_type: \"coder\"` (writes files) or `\"explore\"` (read-only). Never pass `general-purpose`.\n- Progressive disclosure is literal: `Read` the named `references/` file at the step that names it. Do not preload a skill's whole `references/` tree.\n- All three skills write exactly one output file per run and must not echo the generated HTML or JSON back into chat — see each skill's Bedrock-safe-write note. Use a single `Write` call for the whole file.\n- `visuals:excalidraw-diagram` Step 5 shells out to `uv run python render_excalidraw.py` and then reads the PNG back. If image reading is unavailable, say so and skip the visual audit rather than claiming 27/27 quality items passed.",
+  "interface": {
+    "displayName": "Visuals",
+    "shortDescription": "HTML decks, scroll decks, and Excalidraw diagrams from any content",
+    "longDescription": "Visuals bundles the three skills that turn content into something you can show: visualize (single-file HTML decks, dashboards, infographics, posters), md-to-scrolldeck (a Markdown report into a vertical scroll-snap deck), and excalidraw-diagram (.excalidraw JSON that argues visually, rendered and self-audited).",
+    "developerName": "dEitY719",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/dEitY719/visuals-skills"
+  }
+}
