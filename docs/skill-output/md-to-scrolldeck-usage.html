@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="ko" class="theme-light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>md-to-scrolldeck 사용 결과 — Markdown to Scroll Deck</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { interpolate-size: allow-keywords; }
+
+    /* ===== THEMES (class-based ONLY) ===== */
+    html.theme-dark {
+      --bg: #0A0A0A; --surface: #141414; --surface-hover: #1C1C1C;
+      --border: rgba(255,255,255,0.08);
+      --text: #EDEDED; --text-secondary: #888;
+      --accent: #3b82f6; --accent-secondary: #8b5cf6;
+      --positive: #10b981; --negative: #f43f5e; --warning: #f59e0b;
+      --code-bg: #0d0d0d; --code-text: #d4d4d4;
+    }
+    html.theme-light {
+      --bg: #FAFAF9; --surface: #FFFFFF; --surface-hover: #F5F5F4;
+      --border: rgba(0,0,0,0.08);
+      --text: #0f172a; --text-secondary: #64748b;
+      --accent: #2563eb; --accent-secondary: #7c3aed;
+      --positive: #059669; --negative: #e11d48; --warning: #d97706;
+      --code-bg: #0f172a; --code-text: #e2e8f0;
+    }
+
+    body {
+      font-family: 'Inter', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg); color: var(--text);
+      line-height: 1.65; -webkit-font-smoothing: antialiased;
+      letter-spacing: -0.01em; font-feature-settings: 'cv11', 'ss01';
+      transition: background 0.3s, color 0.3s;
+      scrollbar-gutter: stable;
+      word-break: keep-all;
+    }
+    h1,h2,h3,h4,h5,h6 {
+      color: var(--text); letter-spacing: -0.03em;
+      line-height: 1.12; text-wrap: balance; word-break: keep-all;
+    }
+    h1 { font-weight: 800; font-size: clamp(2.4rem, 6vw, 3.6rem); }
+    h2 { font-weight: 700; font-size: clamp(1.6rem, 4vw, 2.1rem); }
+    h3 { font-weight: 600; font-size: 1.5rem; }
+    body, p, li, td, th, span, label { font-weight: 400; }
+    p,li,td,th,span,label { color: var(--text); }
+    .text-secondary { color: var(--text-secondary); }
+    code, .mono { font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace; }
+    a { color: var(--accent); }
+
+    /* ===== LAYOUT ===== */
+    .wrap { max-width: 980px; margin: 0 auto; padding: 0 24px; }
+    section { padding: 56px 0; }
+    .hero { padding: 88px 0 56px; text-align: center; }
+
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 0.8rem; font-weight: 600; letter-spacing: 0.04em;
+      text-transform: uppercase; color: var(--accent);
+      background: color-mix(in srgb, var(--accent) 12%, transparent);
+      padding: 6px 14px; border-radius: 999px; margin-bottom: 24px;
+    }
+    .hero p.lead {
+      font-size: clamp(1.05rem, 2.4vw, 1.25rem);
+      color: var(--text-secondary); max-width: 680px;
+      margin: 22px auto 0; line-height: 1.7;
+    }
+    .hero .lead b { color: var(--text); font-weight: 600; }
+
+    /* ===== CARD ===== */
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; padding: 28px;
+      transition: box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+    /* Shadow only on hover - no translateY/scale (visualize checklist). */
+    .card:hover {
+      box-shadow: 0 0 0 1px var(--border), 0 12px 28px rgba(0,0,0,0.10);
+      border-color: color-mix(in srgb, var(--accent) 28%, var(--border));
+    }
+
+    /* ===== FLOW DIAGRAM ===== */
+    .flow {
+      display: flex; align-items: stretch; justify-content: center;
+      gap: 0; flex-wrap: wrap; margin-top: 16px;
+    }
+    .flow-node {
+      flex: 1 1 0; min-width: 180px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; padding: 26px 20px; text-align: center;
+      display: flex; flex-direction: column; align-items: center; gap: 12px;
+      transition: box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+    .flow-node:hover { box-shadow: 0 10px 24px rgba(0,0,0,0.10); }
+    .flow-node.center {
+      border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+      background: color-mix(in srgb, var(--accent) 7%, var(--surface));
+    }
+    .flow-ico {
+      width: 52px; height: 52px; border-radius: 13px;
+      display: flex; align-items: center; justify-content: center;
+      background: color-mix(in srgb, var(--accent) 14%, transparent);
+      color: var(--accent);
+    }
+    .flow-node.center .flow-ico { background: var(--accent); color: #fff; }
+    .flow-ico svg { width: 26px; height: 26px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .flow-node .ftitle { font-weight: 700; font-size: 1.05rem; }
+    .flow-node .fsub { font-size: 0.82rem; color: var(--text-secondary); }
+    .flow-node .ftag {
+      font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;
+      color: var(--accent-secondary); font-weight: 600;
+    }
+    .flow-arrow {
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-secondary); padding: 0 6px; flex: 0 0 auto;
+    }
+    .flow-arrow svg { width: 34px; height: 34px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    @media (max-width: 720px) {
+      .flow { flex-direction: column; }
+      .flow-arrow { transform: rotate(90deg); padding: 4px 0; }
+    }
+
+    /* ===== CODE BLOCK ===== */
+    .codeblock {
+      position: relative;
+      background: var(--code-bg); border-radius: 12px;
+      padding: 18px 20px; overflow-x: auto;
+      border: 1px solid var(--border); margin-top: 14px;
+    }
+    .codeblock code {
+      color: var(--code-text); font-size: 0.92rem; white-space: pre;
+      display: block; line-height: 1.7;
+    }
+    .codeblock .tok-cmd { color: #7dd3fc; font-weight: 600; }
+    .codeblock .tok-arg { color: #fcd34d; }
+    .codeblock .tok-dim { color: #94a3b8; }
+    .copy-btn {
+      position: absolute; top: 10px; right: 10px;
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.16);
+      color: #cbd5e1; border-radius: 8px; padding: 5px 10px;
+      font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; font-weight: 600;
+      cursor: pointer; transition: background 0.18s, color 0.18s, border-color 0.18s;
+    }
+    .copy-btn:hover { background: rgba(255,255,255,0.16); color: #fff; }
+    .copy-btn.copied { color: #6ee7b7; border-color: #6ee7b7; }
+    .copy-btn svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* ===== SECTION HEADER ===== */
+    .sec-head { display: flex; align-items: center; gap: 16px; margin-bottom: 22px; }
+    .sec-num {
+      flex: 0 0 auto; width: 44px; height: 44px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 1.15rem; color: #fff;
+      background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+    }
+
+    /* ===== KEY-VALUE LIST ===== */
+    .kv { list-style: none; display: grid; gap: 12px; margin-top: 4px; }
+    .kv li { display: flex; gap: 12px; align-items: flex-start; }
+    .kv .dot {
+      flex: 0 0 auto; width: 8px; height: 8px; border-radius: 50%;
+      background: var(--accent); margin-top: 9px;
+    }
+    .kv .dot.cut { background: var(--negative); }
+    .inline-code {
+      font-family: 'JetBrains Mono', monospace; font-size: 0.86em;
+      background: var(--surface-hover); border: 1px solid var(--border);
+      padding: 2px 7px; border-radius: 6px; color: var(--accent-secondary);
+      word-break: break-all;
+    }
+
+    /* ===== OUTLINE TABLE ===== */
+    .tbl-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin-top: 6px; }
+    .outline {
+      width: 100%; min-width: 620px; border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+    .outline th, .outline td {
+      padding: 11px 14px; text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    .outline thead th {
+      font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;
+      font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;
+      color: var(--text-secondary); background: var(--surface-hover);
+      white-space: nowrap;
+    }
+    .outline tbody tr { transition: background 0.15s; }
+    .outline tbody tr:hover { background: var(--surface-hover); }
+    .outline tbody tr:last-child td { border-bottom: none; }
+    .outline .n { font-family: 'JetBrains Mono', monospace; color: var(--text-secondary); width: 40px; }
+    .outline .sid { font-family: 'JetBrains Mono', monospace; color: var(--accent-secondary); font-weight: 600; white-space: nowrap; }
+    .outline .src { font-family: 'JetBrains Mono', monospace; color: var(--text-secondary); font-size: 0.82rem; white-space: nowrap; }
+    .phase {
+      display: inline-block; font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem; font-weight: 700; letter-spacing: 0.05em;
+      border-radius: 5px; padding: 2px 7px; white-space: nowrap;
+      border: 1px solid currentColor;
+    }
+    .phase.intro { color: var(--text-secondary); }
+    .phase.what { color: var(--accent); }
+    .phase.install { color: var(--accent-secondary); }
+    .phase.how { color: var(--warning); }
+    .phase.next { color: var(--positive); }
+    .phase.start { color: var(--negative); }
+
+    /* ===== OUTPUT FILE PILL ===== */
+    .file-pill {
+      display: inline-flex; align-items: center; gap: 12px;
+      background: color-mix(in srgb, var(--positive) 10%, var(--surface));
+      border: 1px solid color-mix(in srgb, var(--positive) 35%, transparent);
+      border-radius: 12px; padding: 14px 18px; margin-top: 16px;
+      text-decoration: none; color: var(--text);
+      font-family: 'JetBrains Mono', monospace; font-weight: 600;
+      transition: box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+    .file-pill:hover { box-shadow: 0 8px 20px rgba(0,0,0,0.10); border-color: var(--positive); }
+    .file-pill .badge { color: var(--positive); display: flex; align-items: center; }
+    .file-pill .badge svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* ===== VERIFY STATS ===== */
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 20px; }
+    @media (max-width: 640px) { .stats { grid-template-columns: 1fr; } }
+    .stat {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 18px 20px; text-align: center;
+    }
+    .stat .num {
+      font-family: 'JetBrains Mono', monospace; font-size: 2rem;
+      font-weight: 700; color: var(--accent); line-height: 1.1;
+    }
+    .stat .lbl { font-size: 0.82rem; color: var(--text-secondary); margin-top: 6px; }
+
+    /* ===== CALLOUT ===== */
+    .callout {
+      border-left: 4px solid var(--accent);
+      background: color-mix(in srgb, var(--accent) 6%, var(--surface));
+      border-radius: 0 12px 12px 0; padding: 20px 24px;
+      font-size: 1.05rem; line-height: 1.7;
+    }
+    .callout b { color: var(--accent); }
+
+    footer { text-align: center; padding: 48px 0 64px; color: var(--text-secondary); font-size: 0.85rem; }
+    footer code { font-family: 'JetBrains Mono', monospace; }
+
+    /* ===== ANIMATIONS ===== */
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+    .animate { animation: fadeInUp 0.6s ease-out both; }
+    .animate.delay-1 { animation-delay: 0.1s; }
+    .animate.delay-2 { animation-delay: 0.2s; }
+    .animate.delay-3 { animation-delay: 0.3s; }
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+      .reveal { opacity: 1; transform: none; }
+    }
+
+    /* ===== PRINT ===== */
+    @media print {
+      body { background: white !important; color: black !important; }
+      .viz-menu, .skip-to-content, .copy-btn { display: none !important; }
+      .reveal { opacity: 1 !important; transform: none !important; }
+      .card, .flow-node, .stat { break-inside: avoid; border: 1px solid #ddd; box-shadow: none; }
+      * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+    }
+    @page { margin: 1in; @bottom-center { content: "Page " counter(page); font-size: 9pt; color: #666; } }
+
+    /* ===== MENU ===== */
+    .viz-menu { position: fixed; top: 16px; right: 16px; z-index: 9999; }
+    .viz-menu-toggle { width: 44px; height: 44px; border-radius: 12px; background: var(--surface); border: 1px solid var(--border); color: var(--text); cursor: pointer; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(12px); transition: all 0.2s; }
+    .viz-menu-toggle:hover { background: var(--surface-hover); }
+    .viz-menu-dropdown { position: absolute; top: 52px; right: 0; min-width: 200px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 8px; opacity: 0; visibility: hidden; transform: translateY(-8px); transition: all 0.2s; backdrop-filter: blur(16px); box-shadow: 0 8px 32px rgba(0,0,0,0.15); }
+    .viz-menu-dropdown.open { opacity: 1; visibility: visible; transform: translateY(0); }
+    .viz-menu-dropdown button { width: 100%; padding: 10px 14px; border: none; border-radius: 8px; background: transparent; color: var(--text); font-size: 14px; font-family: inherit; cursor: pointer; text-align: left; display: flex; align-items: center; gap: 10px; transition: background 0.15s; }
+    .viz-menu-dropdown button:hover { background: var(--surface-hover); }
+
+    .skip-to-content { position: absolute; top: -40px; left: 6px; background: var(--accent); color: white; padding: 8px 12px; text-decoration: none; border-radius: 4px; opacity: 0; pointer-events: none; transition: all 0.2s; z-index: 10000; }
+    .skip-to-content:focus { top: 6px; opacity: 1; pointer-events: auto; }
+  </style>
+</head>
+<body>
+  <!-- MENU -->
+  <div class="viz-menu">
+    <button class="viz-menu-toggle" onclick="toggleMenu()" aria-label="유틸리티 메뉴 열기">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <line x1="3" y1="5" x2="17" y2="5"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="15" x2="17" y2="15"/>
+      </svg>
+    </button>
+    <div class="viz-menu-dropdown" id="vizMenuDropdown">
+      <button onclick="cycleTheme()" aria-label="테마 전환"><span id="themeIcon">☀️</span><span id="themeLabel">Light</span></button>
+      <button onclick="downloadImage()" aria-label="PNG 내려받기"><span>📥</span><span>Download PNG</span></button>
+      <button onclick="window.print()" aria-label="인쇄 또는 PDF 저장"><span>🖨️</span><span>Print / PDF</span></button>
+    </div>
+  </div>
+
+  <a href="#main-content" class="skip-to-content">본문으로 건너뛰기</a>
+
+  <main id="main-content" role="main">
+
+    <!-- HERO -->
+    <header class="hero">
+      <div class="wrap">
+        <span class="eyebrow animate">visuals plugin · 사용 결과</span>
+        <h1 class="animate delay-1">md-to-scrolldeck 사용 결과</h1>
+        <p class="lead animate delay-2">
+          <b>마크다운 문서 한 개</b>를 리더 보고용 <b>세로 스크롤스냅 HTML 덱</b>으로
+          압축합니다. 핵심은 마크업이 아니라 <b>편집적 압축</b> — 제목을 1:1로 옮기지 않고,
+          무엇을 자를지 결정합니다.
+        </p>
+      </div>
+    </header>
+
+    <!-- FLOW -->
+    <section style="padding-top: 0;" data-reveal>
+      <div class="wrap">
+        <div class="flow">
+          <div class="flow-node">
+            <div class="flow-ico">
+              <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/></svg>
+            </div>
+            <div class="ftitle">마크다운 문서</div>
+            <div class="ftag">.md</div>
+            <div class="fsub">제목이 있는 평범한 문서</div>
+          </div>
+
+          <div class="flow-arrow" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+          </div>
+
+          <div class="flow-node center">
+            <div class="flow-ico">
+              <svg viewBox="0 0 24 24"><path d="M12 3v18"/><path d="m7 8 5-5 5 5"/><path d="m7 16 5 5 5-5"/></svg>
+            </div>
+            <div class="ftitle">md-to-scrolldeck</div>
+            <div class="ftag">/visuals:md-to-scrolldeck</div>
+            <div class="fsub">5~20개 내러티브 비트로 압축</div>
+          </div>
+
+          <div class="flow-arrow" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+          </div>
+
+          <div class="flow-node">
+            <div class="flow-ico">
+              <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><circle cx="19" cy="14" r="1"/><circle cx="19" cy="18" r="1"/></svg>
+            </div>
+            <div class="ftitle">세로 스크롤 덱</div>
+            <div class="ftag">.html</div>
+            <div class="fsub">단일 파일, 인쇄 대응</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 01 · 명령 -->
+    <section data-reveal>
+      <div class="wrap">
+        <div class="card">
+          <div class="sec-head"><span class="sec-num">1</span><h2>실행한 명령</h2></div>
+
+          <p class="text-secondary">범용 형식:</p>
+          <div class="codeblock">
+            <code><span class="tok-cmd">/visuals:md-to-scrolldeck</span> <span class="tok-arg">&lt;마크다운-문서-경로&gt;</span> <span class="tok-dim">[--out &lt;경로&gt;] [--slides n] [--outline-only]</span></code>
+          </div>
+
+          <p class="text-secondary" style="margin-top: 22px;">이번 예시:</p>
+          <div class="codeblock">
+            <button class="copy-btn" id="copyCmd" onclick="copyCmd()" aria-label="명령어 복사">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <span id="copyCmdLabel">COPY</span>
+            </button>
+            <code><span class="tok-cmd">/visuals:md-to-scrolldeck</span> <span class="tok-arg">README.md</span> <span class="tok-dim">--out docs/skill-output/md-to-scrolldeck-deck.html --no-open</span></code>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 02 · 입력 -->
+    <section data-reveal>
+      <div class="wrap">
+        <div class="card">
+          <div class="sec-head"><span class="sec-num">2</span><h2>입력 (마크다운 문서)</h2></div>
+          <ul class="kv">
+            <li><span class="dot"></span><span><b>입력 파일:</b> <a href="../../README.md"><span class="inline-code">README.md</span></a> — 이 저장소의 README (177줄)</span></li>
+            <li><span class="dot"></span><span>어떤 마크다운 문서든 입력으로 넣을 수 있습니다. 이번에는 저장소 자신의 README 를 "리더에게 보고하는 문서" 로 보고 덱으로 만들었습니다.</span></li>
+            <li><span class="dot"></span><span>입력 문서는 <b>절대 수정되지 않습니다.</b> 한 번에 한 파일만 처리합니다.</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 03 · 아웃라인 -->
+    <section data-reveal>
+      <div class="wrap">
+        <div class="card">
+          <div class="sec-head"><span class="sec-num">3</span><h2>중간 산출물 (슬라이드 아웃라인)</h2></div>
+          <p class="text-secondary" style="margin-bottom: 18px;">
+            이 스킬은 <b>HTML 을 쓰기 전에 먼저 아웃라인을 출력</b>합니다. 여기서 무엇이
+            살아남고 무엇이 잘렸는지 확인하고 개입할 수 있습니다. 이것이 스킬의 핵심 품질 장치입니다.
+          </p>
+
+          <div class="tbl-wrap">
+            <table class="outline">
+              <thead>
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">id</th>
+                  <th scope="col">라벨</th>
+                  <th scope="col">phase</th>
+                  <th scope="col">출처</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td class="n">1</td><td class="sid">hero</td><td>보여줄 수 있는 것으로 만드는 세 스킬</td><td><span class="phase intro">INTRO</span></td><td class="src">L1-6</td></tr>
+                <tr><td class="n">2</td><td class="sid">three-skills</td><td>세 개의 산출물, 세 개의 스킬</td><td><span class="phase what">WHAT</span></td><td class="src">L8-14</td></tr>
+                <tr><td class="n">3</td><td class="sid">pick-rule</td><td>주제가 아니라 산출물로 고른다</td><td><span class="phase what">WHAT</span></td><td class="src">L16-18</td></tr>
+                <tr><td class="n">4</td><td class="sid">install</td><td>여섯 하네스, 한 줄 설치</td><td><span class="phase install">INSTALL</span></td><td class="src">L29-72</td></tr>
+                <tr><td class="n">5</td><td class="sid">support-matrix</td><td>어디까지 되는가</td><td><span class="phase how">HOW</span></td><td class="src">L74-86</td></tr>
+                <tr><td class="n">6</td><td class="sid">image-readback</td><td>이미지를 되읽지 못하는 하네스라면</td><td><span class="phase how">HOW</span></td><td class="src">L88-95</td></tr>
+                <tr><td class="n">7</td><td class="sid">layout-flat</td><td>매니페스트는 루트, 스킬은 평평하게</td><td><span class="phase how">HOW</span></td><td class="src">L97-118</td></tr>
+                <tr><td class="n">8</td><td class="sid">layout-why</td><td>중첩 레이아웃을 버린 이유</td><td><span class="phase how">HOW</span></td><td class="src">L120-128</td></tr>
+                <tr><td class="n">9</td><td class="sid">ci-selfcontained</td><td>공유 워크플로우를 쓰지 않는다</td><td><span class="phase how">HOW</span></td><td class="src">L130-145</td></tr>
+                <tr><td class="n">10</td><td class="sid">ci-gate</td><td>되돌아가기 위한 단 하나의 조건</td><td><span class="phase next">NEXT</span></td><td class="src">L147-153</td></tr>
+                <tr><td class="n">11</td><td class="sid">provenance</td><td>이 스킬들은 어디서 왔는가</td><td><span class="phase next">NEXT</span></td><td class="src">L155-173</td></tr>
+                <tr><td class="n">12</td><td class="sid">close</td><td>MIT, 그리고 시작하기</td><td><span class="phase start">START</span></td><td class="src">L175-177</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3 style="font-size: 1.05rem; margin-top: 28px; margin-bottom: 12px;">잘라낸 것</h3>
+          <ul class="kv">
+            <li><span class="dot cut"></span><span>GitHub Pages 링크 목록 (L20-27) — 링크 덤프는 슬라이드가 되지 않습니다.</span></li>
+            <li><span class="dot cut"></span><span>하네스별 설치 코드블록 7개 — 슬라이드 4의 카드 그리드 하나로 병합.</span></li>
+            <li><span class="dot cut"></span><span><span class="inline-code">.kimi-plugin</span> 사전 프로비저닝 각주 — 슬라이드 8에 흡수.</span></li>
+          </ul>
+
+          <div class="callout" style="margin-top: 24px;">
+            <p>177줄 문서에서 제목 개수만큼이 아니라 <b>12개 슬라이드</b>가 나온 이유가 이것입니다. 제목은 저자가 화제를 바꾼 지점이고, 슬라이드는 청중이 생각을 바꿔야 하는 지점입니다.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 04 · 결과 -->
+    <section data-reveal>
+      <div class="wrap">
+        <div class="card">
+          <div class="sec-head"><span class="sec-num">4</span><h2>결과 (스크롤 덱)</h2></div>
+
+          <p class="text-secondary">단일 HTML 파일이며, 별도 의존성 없이 브라우저에서 바로 열립니다.</p>
+
+          <a class="file-pill" href="./md-to-scrolldeck-deck.html">
+            <span class="badge" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>
+            </span>
+            <span>docs/skill-output/md-to-scrolldeck-deck.html</span>
+          </a>
+
+          <div class="stats">
+            <div class="stat"><div class="num" data-count="12">12</div><div class="lbl">슬라이드 = 도트 12개</div></div>
+            <div class="stat"><div class="num" data-count="11">11</div><div class="lbl">스크롤 큐, 모두 다음 슬라이드로 연결</div></div>
+            <div class="stat"><div class="num" data-count="0">0</div><div class="lbl">금지 항목 위반</div></div>
+          </div>
+
+          <h3 style="font-size: 1.05rem; margin-top: 28px; margin-bottom: 12px;">포함된 덱 크롬</h3>
+          <ul class="kv">
+            <li><span class="dot"></span><span>상단 진행바 · 고정 헤더(<span class="inline-code">01 / 12</span> 카운터) · 우측 도트 레일</span></li>
+            <li><span class="dot"></span><span>방향키 내비게이션 (PageUp/PageDown/Home/End/Space 포함)</span></li>
+            <li><span class="dot"></span><span><span class="inline-code">scroll-snap-type: y mandatory</span> 와 <span class="inline-code">IntersectionObserver</span> 활성 슬라이드 추적</span></li>
+            <li><span class="dot"></span><span>인쇄 시 스냅 해제 + 슬라이드당 한 페이지, JS 없이도 전체 내용 노출</span></li>
+            <li><span class="dot"></span><span>작성 후 체크리스트 검증 통과 — 테마 토글 · 햄버거 메뉴 · PNG 내보내기 · base64 폰트 0건</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section style="padding-top: 0;" data-reveal>
+      <div class="wrap">
+        <div class="callout">
+          <p>문서를 요약하는 것이 아니라, <b>무엇을 버릴지 결정해서 이야기로 만드는 것</b>이 <code>md-to-scrolldeck</code> 스킬의 역할입니다.</p>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="wrap">
+        <p>visuals plugin · <code>md-to-scrolldeck</code> · dEitY719 · MIT License</p>
+      </div>
+    </footer>
+
+  </main>
+
+  <script>
+    // === Menu ===
+    function toggleMenu() {
+      var dropdown = document.getElementById('vizMenuDropdown');
+      if (dropdown) dropdown.classList.toggle('open');
+    }
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.viz-menu')) {
+        var dropdown = document.getElementById('vizMenuDropdown');
+        if (dropdown) dropdown.classList.remove('open');
+      }
+    });
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        var dropdown = document.getElementById('vizMenuDropdown');
+        if (dropdown) dropdown.classList.remove('open');
+      }
+    });
+
+    // === Theme (class-based, OS detection on first visit) ===
+    var savedTheme = localStorage.getItem('viz-theme');
+    var currentTheme = savedTheme || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    function applyTheme(t) {
+      document.documentElement.className = 'theme-' + t;
+      document.getElementById('themeIcon').textContent = t === 'dark' ? '🌙' : '☀️';
+      document.getElementById('themeLabel').textContent = t === 'dark' ? 'Dark' : 'Light';
+      localStorage.setItem('viz-theme', t);
+      currentTheme = t;
+    }
+    function cycleTheme() { applyTheme(currentTheme === 'dark' ? 'light' : 'dark'); }
+    applyTheme(currentTheme);
+
+    // === Scroll Reveal (content visible without JS) ===
+    document.querySelectorAll('[data-reveal]').forEach(function(el) { el.classList.add('reveal'); });
+    var revealObserver = new IntersectionObserver(function(entries) {
+      entries.forEach(function(e) { if (e.isIntersecting) { e.target.classList.add('visible'); revealObserver.unobserve(e.target); } });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.reveal').forEach(function(el) { revealObserver.observe(el); });
+
+    // === Number counters ===
+    function animateCounters() {
+      document.querySelectorAll('[data-count]').forEach(function(el) {
+        if (el.dataset.counted) return;
+        el.dataset.counted = '1';
+        var target = parseFloat(el.dataset.count);
+        var start = performance.now(), duration = 1000;
+        (function tick(now) {
+          var p = Math.min((now - start) / duration, 1), eased = 1 - Math.pow(1 - p, 3);
+          el.textContent = Math.round(target * eased).toLocaleString();
+          if (p < 1) requestAnimationFrame(tick);
+        })(start);
+      });
+    }
+    var counterEl = document.querySelector('[data-count]');
+    if (counterEl) {
+      var cObs = new IntersectionObserver(function(entries) {
+        entries.forEach(function(e) { if (e.isIntersecting) { animateCounters(); cObs.disconnect(); } });
+      }, { threshold: 0.3 });
+      cObs.observe(counterEl);
+    }
+
+    // === Copy the example command ===
+    var copyResetTimer = 0;
+    function copyCmd() {
+      var btn = document.getElementById('copyCmd');
+      var label = document.getElementById('copyCmdLabel');
+      var cmd = '/visuals:md-to-scrolldeck README.md --out docs/skill-output/md-to-scrolldeck-deck.html --no-open';
+      function done() {
+        label.textContent = 'COPIED';
+        btn.classList.add('copied');
+        clearTimeout(copyResetTimer);
+        copyResetTimer = setTimeout(function() {
+          label.textContent = 'COPY';
+          btn.classList.remove('copied');
+        }, 1400);
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(cmd).then(done, fallback);
+      } else { fallback(); }
+      function fallback() {
+        var ta = document.createElement('textarea');
+        ta.value = cmd; ta.setAttribute('readonly', '');
+        ta.style.position = 'absolute'; ta.style.left = '-9999px';
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); done(); } catch(e) { /* clipboard unavailable */ }
+        document.body.removeChild(ta);
+      }
+    }
+
+    // === Download PNG ===
+    async function downloadImage() {
+      var menu = document.querySelector('.viz-menu');
+      menu.style.display = 'none';
+      try {
+        var url = await htmlToImage.toPng(document.body, { quality: 1, pixelRatio: 2, filter: function(n) { return !n.classList || !n.classList.contains('viz-menu'); } });
+        var a = document.createElement('a'); a.href = url;
+        a.download = document.title.replace(/\s+/g, '-').toLowerCase() + '.png'; a.click();
+      } catch(e) { console.error('Download failed:', e); }
+      menu.style.display = '';
+    }
+  </script>
+</body>
+</html>

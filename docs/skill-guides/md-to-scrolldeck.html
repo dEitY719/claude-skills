@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en" class="theme-light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>md-to-scrolldeck — Skill Reference</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { interpolate-size: allow-keywords; }
+
+    /* ===== THEMES (class-based ONLY) ===== */
+    html.theme-dark {
+      --bg: #0A0A0A; --surface: #141414; --surface-hover: #1C1C1C;
+      --border: rgba(255,255,255,0.07);
+      --text: #EDEDED; --text-secondary: #888;
+      --accent: #3b82f6; --accent-secondary: #8b5cf6;
+      --positive: #10b981; --negative: #f43f5e; --warning: #f59e0b;
+      --code-bg: #1a1a1a;
+    }
+    html.theme-light {
+      --bg: #FAFAF9; --surface: #FFFFFF; --surface-hover: #F5F5F4;
+      --border: rgba(0,0,0,0.08);
+      --text: #0f172a; --text-secondary: #64748b;
+      --accent: #2563eb; --accent-secondary: #7c3aed;
+      --positive: #059669; --negative: #e11d48; --warning: #d97706;
+      --code-bg: #f1f5f9;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg); color: var(--text);
+      line-height: 1.6; -webkit-font-smoothing: antialiased;
+      letter-spacing: -0.01em; font-feature-settings: 'cv11', 'ss01';
+      transition: background 0.3s, color 0.3s;
+      scrollbar-gutter: stable;
+    }
+    h1,h2,h3,h4,h5,h6 { color: var(--text); letter-spacing: -0.03em; line-height: 1.1; text-wrap: balance; }
+    h1 { font-weight: 800; font-size: clamp(2.6rem, 6vw, 4rem); }
+    h2 { font-weight: 700; font-size: clamp(1.8rem, 4vw, 2.4rem); }
+    h3 { font-weight: 600; font-size: 1.5rem; }
+    body, p, li, td, th, span, label { font-weight: 400; }
+    p,li,td,th,span,label { color: var(--text); }
+    .text-secondary { color: var(--text-secondary); }
+    code, .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+    a { color: var(--accent); }
+
+    main#page { max-width: 1140px; margin: 0 auto; padding: 0 24px 100px; }
+    section { padding: 56px 0 8px; }
+
+    /* ===== HERO ===== */
+    .hero { padding: 88px 0 40px; text-align: center; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--surface); border: 1px solid var(--border);
+      padding: 6px 14px; border-radius: 999px; font-size: 0.8rem;
+      font-weight: 600; color: var(--text-secondary); margin-bottom: 24px;
+      letter-spacing: 0.02em;
+    }
+    .badge .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--positive); }
+    .hero h1 { background: linear-gradient(120deg, var(--accent), var(--accent-secondary)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero .lede { font-size: clamp(1.1rem, 2.5vw, 1.4rem); color: var(--text-secondary); max-width: 680px; margin: 22px auto 0; font-weight: 400; }
+    .meta-row { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 30px; }
+    .pill { font-size: 0.8rem; font-weight: 500; color: var(--text-secondary); background: var(--surface); border: 1px solid var(--border); padding: 6px 13px; border-radius: 8px; }
+    .pill strong { color: var(--text); font-weight: 600; }
+    button.pill { font-family: inherit; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: border-color 0.18s, color 0.18s; }
+    button.pill:hover { border-color: var(--accent); color: var(--accent); }
+    button.pill.copied { border-color: var(--positive); color: var(--positive); }
+    button.pill svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* ===== SECTION HEADERS ===== */
+    .sec-head { display: flex; align-items: center; gap: 14px; margin-bottom: 8px; }
+    .sec-num { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; font-weight: 600; color: var(--accent); border: 1px solid var(--border); background: var(--surface); border-radius: 8px; padding: 4px 10px; }
+    .sec-sub { color: var(--text-secondary); font-size: 1.05rem; margin-top: 6px; margin-bottom: 28px; max-width: 720px; }
+
+    /* ===== CARD ===== */
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; padding: 24px;
+      transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+    }
+    /* Shadow only on hover - no translateY/scale (checklist: Menu & Interactions). */
+    .card:hover { box-shadow: 0 0 0 1px var(--border), 0 12px 28px rgba(0,0,0,0.10); border-color: color-mix(in srgb, var(--accent) 30%, var(--border)); }
+
+    .grid { display: grid; gap: 18px; }
+    .grid-2 { grid-template-columns: repeat(2, 1fr); }
+    .grid-3 { grid-template-columns: repeat(3, 1fr); }
+    @media (max-width: 860px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+    /* ===== CRITICAL REQ CARDS ===== */
+    .req-card { position: relative; padding-left: 24px; overflow: hidden; }
+    .req-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--negative); }
+    .req-card .rnum { font-family: 'JetBrains Mono', monospace; font-weight: 700; color: var(--negative); font-size: 0.85rem; }
+    .req-card h4 { font-size: 1.12rem; font-weight: 700; margin: 6px 0 8px; }
+    .req-card p { font-size: 0.93rem; color: var(--text-secondary); line-height: 1.55; }
+    .req-card code { font-size: 0.82rem; background: var(--code-bg); padding: 1px 6px; border-radius: 5px; color: var(--text); white-space: nowrap; }
+    .tag-critical { display: inline-block; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--warning); border: 1px solid var(--warning); border-radius: 5px; padding: 1px 6px; margin-top: 10px; }
+
+    .warn-banner {
+      display: flex; gap: 16px; align-items: flex-start;
+      background: color-mix(in srgb, var(--negative) 9%, var(--surface));
+      border: 1px solid color-mix(in srgb, var(--negative) 35%, var(--border));
+      border-radius: 14px; padding: 20px 24px; margin-bottom: 30px;
+    }
+    .warn-banner .ico { font-size: 1.6rem; line-height: 1; }
+    .warn-banner strong { color: var(--negative); }
+
+    /* ===== PRINCIPLES ===== */
+    .principle h4 { display: flex; align-items: center; gap: 10px; font-size: 1.08rem; font-weight: 700; margin-bottom: 6px; }
+    .principle .pico { width: 34px; height: 34px; flex-shrink: 0; border-radius: 9px; display: grid; place-items: center; background: color-mix(in srgb, var(--accent) 14%, transparent); }
+    .principle p { font-size: 0.9rem; color: var(--text-secondary); }
+    svg.i { width: 18px; height: 18px; stroke: var(--accent); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* ===== PROCESS TIMELINE ===== */
+    .steps { display: grid; gap: 0; }
+    .step { display: grid; grid-template-columns: 56px 1fr; gap: 18px; padding-bottom: 26px; position: relative; }
+    .step:not(:last-child)::before { content: ''; position: absolute; left: 27px; top: 48px; bottom: 0; width: 2px; background: var(--border); }
+    .step .sdot { width: 48px; height: 48px; border-radius: 50%; background: var(--surface); border: 2px solid var(--accent); color: var(--accent); display: grid; place-items: center; font-weight: 700; font-family: 'JetBrains Mono', monospace; z-index: 1; }
+    .step h4 { font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; }
+    .step p { color: var(--text-secondary); font-size: 0.93rem; }
+    .step code { background: var(--code-bg); padding: 1px 6px; border-radius: 5px; font-size: 0.82rem; }
+
+    /* ===== CHROME CHIPS ===== */
+    .chips { display: flex; flex-wrap: wrap; gap: 10px; }
+    .chip { background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: 8px 16px; font-size: 0.88rem; font-weight: 500; transition: all 0.18s; }
+    .chip:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+
+    /* ===== FLAG LIST ===== */
+    .rule-list { list-style: none; display: grid; gap: 14px; }
+    .rule-list li { display: flex; gap: 14px; align-items: flex-start; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; }
+    .rule-list .k { font-family: 'JetBrains Mono', monospace; font-weight: 700; color: var(--accent-secondary); flex-shrink: 0; font-size: 0.9rem; min-width: 150px; }
+    .rule-list .v { font-size: 0.93rem; }
+    .rule-list code { background: var(--code-bg); padding: 1px 6px; border-radius: 5px; font-size: 0.82rem; }
+    @media (max-width: 700px) { .rule-list li { flex-direction: column; gap: 6px; } }
+
+    /* ===== SIZING TABLE ===== */
+    .tbl-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .tbl { width: 100%; min-width: 460px; border-collapse: collapse; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+    .tbl th, .tbl td { padding: 13px 18px; text-align: left; border-bottom: 1px solid var(--border); font-size: 0.92rem; }
+    .tbl thead th { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); background: var(--surface-hover); }
+    .tbl tbody tr:last-child td { border-bottom: none; }
+    .tbl td:last-child { font-family: 'JetBrains Mono', monospace; font-weight: 600; color: var(--accent); }
+
+    /* ===== MSC (merge/split/cut) ===== */
+    .msc h4 { display: flex; align-items: baseline; gap: 10px; font-size: 1.08rem; font-weight: 700; margin-bottom: 8px; }
+    .msc .verb { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border-radius: 5px; padding: 2px 7px; }
+    .msc .verb.merge { color: var(--positive); border: 1px solid var(--positive); }
+    .msc .verb.split { color: var(--accent); border: 1px solid var(--accent); }
+    .msc .verb.cut { color: var(--negative); border: 1px solid var(--negative); }
+    .msc ul { list-style: none; display: grid; gap: 7px; }
+    .msc li { font-size: 0.9rem; color: var(--text-secondary); padding-left: 16px; position: relative; }
+    .msc li::before { content: ''; position: absolute; left: 0; top: 9px; width: 5px; height: 5px; border-radius: 50%; background: var(--border); }
+
+    .callout { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 12px; padding: 20px 24px; }
+    .callout p { color: var(--text-secondary); font-size: 0.95rem; }
+    .callout code { background: var(--code-bg); padding: 1px 6px; border-radius: 5px; font-size: 0.85rem; }
+
+    footer { text-align: center; padding: 60px 0 0; color: var(--text-secondary); font-size: 0.85rem; }
+    footer code { background: var(--code-bg); padding: 2px 7px; border-radius: 5px; }
+
+    /* ===== ANIMATIONS ===== */
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+    .animate { animation: fadeInUp 0.6s ease-out both; }
+    .animate.delay-1 { animation-delay: 0.08s; }
+    .animate.delay-2 { animation-delay: 0.16s; }
+    .animate.delay-3 { animation-delay: 0.24s; }
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+      .reveal { opacity: 1; transform: none; }
+    }
+
+    /* ===== PRINT ===== */
+    @media print {
+      body { background: white !important; color: black !important; }
+      .viz-menu, .skip-to-content { display: none !important; }
+      .reveal { opacity: 1 !important; transform: none !important; }
+      .card, .rule-list li { break-inside: avoid; border: 1px solid #ddd; box-shadow: none; }
+      * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+    }
+    @page { margin: 1in; @bottom-center { content: "Page " counter(page); font-size: 9pt; color: #666; } }
+
+    /* ===== MENU ===== */
+    .viz-menu { position: fixed; top: 16px; right: 16px; z-index: 9999; }
+    .viz-menu-toggle { width: 44px; height: 44px; border-radius: 12px; background: var(--surface); border: 1px solid var(--border); color: var(--text); cursor: pointer; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(12px); transition: all 0.2s; }
+    .viz-menu-toggle:hover { background: var(--surface-hover); }
+    .viz-menu-dropdown { position: absolute; top: 52px; right: 0; min-width: 200px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 8px; opacity: 0; visibility: hidden; transform: translateY(-8px); transition: all 0.2s; backdrop-filter: blur(16px); box-shadow: 0 8px 32px rgba(0,0,0,0.15); }
+    .viz-menu-dropdown.open { opacity: 1; visibility: visible; transform: translateY(0); }
+    .viz-menu-dropdown button { width: 100%; padding: 10px 14px; border: none; border-radius: 8px; background: transparent; color: var(--text); font-size: 14px; font-family: inherit; cursor: pointer; text-align: left; display: flex; align-items: center; gap: 10px; transition: background 0.15s; }
+    .viz-menu-dropdown button:hover { background: var(--surface-hover); }
+
+    .skip-to-content { position: absolute; top: -40px; left: 6px; background: var(--accent); color: white; padding: 8px 12px; text-decoration: none; border-radius: 4px; opacity: 0; pointer-events: none; transition: all 0.2s; z-index: 10000; }
+    .skip-to-content:focus { top: 6px; opacity: 1; pointer-events: auto; }
+  </style>
+</head>
+<body>
+  <!-- MENU -->
+  <div class="viz-menu">
+    <button class="viz-menu-toggle" onclick="toggleMenu()" aria-label="Open utility menu">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <line x1="3" y1="5" x2="17" y2="5"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="15" x2="17" y2="15"/>
+      </svg>
+    </button>
+    <div class="viz-menu-dropdown" id="vizMenuDropdown">
+      <button onclick="cycleTheme()" aria-label="Toggle theme"><span id="themeIcon">☀️</span><span id="themeLabel">Light</span></button>
+      <button onclick="downloadImage()" aria-label="Download PNG"><span>📥</span><span>Download PNG</span></button>
+      <button onclick="window.print()" aria-label="Print or save PDF"><span>🖨️</span><span>Print / PDF</span></button>
+    </div>
+  </div>
+
+  <a href="#page" class="skip-to-content">Skip to content</a>
+
+  <main id="page" role="main">
+
+    <!-- HERO -->
+    <header class="hero">
+      <div class="badge animate"><span class="dot"></span>visuals plugin · skill reference</div>
+      <h1 class="animate delay-1">md-to-scrolldeck</h1>
+      <p class="lede animate delay-2">
+        Turns one Markdown document into a single self-contained vertical
+        scroll-snap deck — scrollytelling for the leader who will scroll it
+        themselves or project it in a review.
+      </p>
+      <div class="meta-row animate delay-3">
+        <button class="pill" id="copyInvoke" onclick="copyInvoke()" aria-label="Copy the invoke command to the clipboard">
+          <strong>Invoke</strong>
+          <span id="copyInvokeText">/visuals:md-to-scrolldeck</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </button>
+        <span class="pill"><strong>Version</strong> 0.1.0</span>
+        <span class="pill"><strong>Category</strong> document-creation</span>
+        <span class="pill"><strong>Model tier</strong> sonnet</span>
+        <span class="pill"><strong>Output</strong> 1 HTML file</span>
+      </div>
+    </header>
+
+    <!-- 01 · THE ONE RULE -->
+    <section data-reveal>
+      <div class="warn-banner">
+        <span class="ico" aria-hidden="true">📐</span>
+        <div>
+          <p><strong>The outline comes before the HTML.</strong></p>
+          <p class="text-secondary">
+            The skill prints its nav-dot outline — slide id, label, archetype,
+            phase, source line ranges, and everything it cut — <em>before</em>
+            writing a single tag. That printed outline is the main quality lever
+            of the whole skill and your chance to interrupt. It does not block
+            waiting for approval; it shows its work and continues.
+          </p>
+        </div>
+      </div>
+
+      <div class="sec-head"><span class="sec-num">01</span><h2>Hard requirements</h2></div>
+      <p class="sec-sub">
+        Nine rules the skill does not bend. Most exist because a specific failure
+        happened once and is documented in the skill's <code>references/</code>.
+      </p>
+
+      <div class="grid grid-3">
+        <div class="card req-card">
+          <span class="rnum">R01</span>
+          <h4>Never write the HTML from scratch</h4>
+          <p>
+            Copy <code>scroll-deck-skeleton.md</code> and replace its
+            <code>YOUR ... HERE</code> tokens. The chrome is load-bearing and the
+            checklist greps for it.
+          </p>
+          <span class="tag-critical">Critical</span>
+        </div>
+        <div class="card req-card">
+          <span class="rnum">R02</span>
+          <h4>One Write call, no chat echo</h4>
+          <p>
+            The whole file goes out in a single <code>Write</code>. The generated
+            HTML is never echoed into chat — summary plus <code>file://</code> URL
+            only. This is what prevents Bedrock's
+            <code>Truncated event message received</code>.
+          </p>
+          <span class="tag-critical">Critical</span>
+        </div>
+        <div class="card req-card">
+          <span class="rnum">R03</span>
+          <h4>No menu, no theme toggle, no PNG export</h4>
+          <p>
+            A deliberate divergence from <code>visuals:visualize</code>. A scroll
+            deck is one designed light-paper theme; dark slides are editorial
+            contrast, not a user setting. Do not add <code>.viz-menu</code> back.
+          </p>
+        </div>
+        <div class="card req-card">
+          <span class="rnum">R04</span>
+          <h4>Never invent content</h4>
+          <p>
+            Every figure, name, and quote comes from the source document. A slide
+            with no source line range is a slide that gets cut.
+          </p>
+          <span class="tag-critical">Critical</span>
+        </div>
+        <div class="card req-card">
+          <span class="rnum">R05</span>
+          <h4>No base64 font by default</h4>
+          <p>
+            The webfont comes from a CDN. Embedding it is a multi-megabyte single
+            line that trips the same Bedrock truncation.
+            <code>--offline-font</code> exists but warns first.
+          </p>
+        </div>
+        <div class="card req-card">
+          <span class="rnum">R06</span>
+          <h4>Not a horizontal carousel</h4>
+          <p>
+            No <code>translateX</code> slide transitions, no click-zone
+            navigation, no Reveal.js. Vertical scroll-snap only.
+          </p>
+        </div>
+        <div class="card req-card">
+          <span class="rnum">R07</span>
+          <h4>One file in, one file out</h4>
+          <p>
+            No multi-file batching, and the input Markdown is never modified.
+            Existing output is overwritten silently but always reported.
+          </p>
+        </div>
+        <div class="card req-card">
+          <span class="rnum">R08</span>
+          <h4>Verify before reporting</h4>
+          <p>
+            Run the checklist greps against the file just written. Any failure is
+            fixed and rewritten first — never report a broken dot rail as
+            <code>[OK]</code>. Waived items are <code>[WARN]</code>, never silent.
+          </p>
+          <span class="tag-critical">Critical</span>
+        </div>
+        <div class="card req-card">
+          <span class="rnum">R09</span>
+          <h4>xdg-open, never wslview</h4>
+          <p>
+            <code>xdg-open</code> on Linux and WSL, <code>open</code> on macOS.
+            <code>wslview</code> errors on HTML files.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 02 · PRINCIPLES -->
+    <section data-reveal>
+      <div class="sec-head"><span class="sec-num">02</span><h2>Core principles</h2></div>
+      <p class="sec-sub">
+        The markup is the easy part. What makes a hand-made deck beat a generated
+        one is that someone decided what the document is about, and cut the rest.
+      </p>
+
+      <div class="grid grid-3">
+        <div class="card principle">
+          <h4><span class="pico"><svg class="i" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></span>Editorial compression</h4>
+          <p>
+            Not a heading-to-slide <code>map()</code>. Sections merge, split, or
+            get cut. Headings mark where an author changed topic; slides mark
+            where a presenter changes what the audience should be thinking about.
+          </p>
+        </div>
+        <div class="card principle">
+          <h4><span class="pico"><svg class="i" viewBox="0 0 24 24"><path d="M2 12h20M12 2v20"/></svg></span>Read the whole document first</h4>
+          <p>
+            You need the ending to know what the opening should set up. No
+            outlining after the first screenful.
+          </p>
+        </div>
+        <div class="card principle">
+          <h4><span class="pico"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg></span>Fixed skeleton</h4>
+          <p>
+            Progress bar, phase header, dot rail, observer, print styles — all
+            copied, never improvised. The checklist verifies each one is still
+            wired.
+          </p>
+        </div>
+        <div class="card principle">
+          <h4><span class="pico"><svg class="i" viewBox="0 0 24 24"><path d="M12 20V10M6 20v-6M18 20V4"/></svg></span>Shape, not just sequence</h4>
+          <p>
+            Three to five structural phases — <code>WHY</code> to
+            <code>WHAT</code> to <code>NOW</code> to <code>NEXT</code> to
+            <code>START</code> — become <code>data-phase</code> values that the
+            header reads live.
+          </p>
+        </div>
+        <div class="card principle">
+          <h4><span class="pico"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></span>Resilient by default</h4>
+          <p>
+            Content is visible without JavaScript, motion respects
+            <code>prefers-reduced-motion</code>, snap turns off under 767px, and
+            print gives every slide its own page.
+          </p>
+        </div>
+        <div class="card principle">
+          <h4><span class="pico"><svg class="i" viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M9 9h6v6H9z"/></svg></span>Vary the treatment</h4>
+          <p>
+            No three consecutive slides look identical. The skeleton ships a
+            variant rotation to rotate through.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 03 · ARGUMENTS -->
+    <section data-reveal>
+      <div class="sec-head"><span class="sec-num">03</span><h2>Arguments and flags</h2></div>
+      <p class="sec-sub">
+        Exactly one positional. Two or more input files is a hard stop —
+        <code>[FAIL] one Markdown file per run</code>.
+      </p>
+
+      <ul class="rule-list">
+        <li><span class="k">&lt;input.md&gt;</span><span class="v"><strong>Required.</strong> Path to the source Markdown file, one per run. A missing path fails; a non-<code>.md</code> extension only warns.</span></li>
+        <li><span class="k">--out &lt;path&gt;</span><span class="v">Explicit output path. Default is the input's directory and basename with an <code>.html</code> extension — <code>docs/vision.md</code> becomes <code>docs/vision.html</code>.</span></li>
+        <li><span class="k">--slides &lt;n&gt;</span><span class="v">Force a slide count instead of the curated estimate. Range 5 to 20.</span></li>
+        <li><span class="k">--outline-only</span><span class="v">Print the nav-dot outline and stop. No HTML is written.</span></li>
+        <li><span class="k">--lang &lt;code&gt;</span><span class="v">Override <code>&lt;html lang&gt;</code>, e.g. <code>en</code> or <code>ko</code>. Inferred from the source when omitted.</span></li>
+        <li><span class="k">--offline-font</span><span class="v">Embed the webfont as base64 instead of linking a CDN. Warned and discouraged.</span></li>
+        <li><span class="k">--no-open</span><span class="v">Skip the <code>xdg-open</code> / <code>open</code> step after writing.</span></li>
+      </ul>
+    </section>
+
+    <!-- 04 · PROCESS -->
+    <section data-reveal>
+      <div class="sec-head"><span class="sec-num">04</span><h2>Process</h2></div>
+      <p class="sec-sub">Three steps. Step 2 is where the quality is decided.</p>
+
+      <div class="steps">
+        <div class="step">
+          <div class="sdot">01</div>
+          <div>
+            <h4>Parse arguments and validate the input</h4>
+            <p>
+              Resolve the output path, confirm the source is readable, and stop
+              early on a missing file or a second positional.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="sdot">02</div>
+          <div>
+            <h4>Read the whole document, then outline</h4>
+            <p>
+              Compress the source into 5 to 20 narrative beats and print the
+              nav-dot outline with source line ranges and the cut list. Fewer than
+              5 beats warns that a <code>visuals:visualize</code> one-pager fits
+              better; more than 20 proposes a scope cut rather than silently
+              building 30 slides.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="sdot">03</div>
+          <div>
+            <h4>Build, write once, verify, deliver</h4>
+            <p>
+              Fill the skeleton, write the file in one call, run the checklist
+              greps against what was written, fix and rewrite on any failure, then
+              open it and report <code>slides=&lt;n&gt;</code> with the
+              <code>file://</code> URL, the slide-id list, and what was cut.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 05 · CURATION -->
+    <section data-reveal>
+      <div class="sec-head"><span class="sec-num">05</span><h2>Curation: merge, split, cut</h2></div>
+      <p class="sec-sub">
+        Target roughly one slide per 30 to 40 source lines, then adjust by
+        judgement. Treat it as a starting estimate, never as arithmetic.
+      </p>
+
+      <div class="grid grid-3" style="margin-bottom: 22px;">
+        <div class="card msc">
+          <h4><span class="verb merge">Merge</span></h4>
+          <ul>
+            <li>Consecutive headings are facets of one concept</li>
+            <li>A section is a short list that fits as a card grid inside its parent's slide</li>
+            <li>A section is only a bridge sentence</li>
+          </ul>
+        </div>
+        <div class="card msc">
+          <h4><span class="verb split">Split</span></h4>
+          <ul>
+            <li>One heading contains two distinct claims</li>
+            <li>A heading holds a long process the audience must follow step by step</li>
+            <li>A table has more than about 5 rows and its rows are the actual content</li>
+          </ul>
+        </div>
+        <div class="card msc">
+          <h4><span class="verb cut">Cut</span></h4>
+          <ul>
+            <li>Reference lists and link dumps</li>
+            <li>A caveat only the author cares about</li>
+            <li>Anything repeating a point already made</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="tbl-wrap">
+      <table class="tbl">
+        <thead>
+          <tr><th scope="col">Source length</th><th scope="col">What that usually means</th><th scope="col">Typical deck</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>under 150 lines</td><td>Often a better one-pager than a deck</td><td>5&ndash;8 slides</td></tr>
+          <tr><td>150&ndash;400 lines</td><td>The comfortable range</td><td>8&ndash;13 slides</td></tr>
+          <tr><td>400&ndash;800 lines</td><td>Cutting starts to matter a lot</td><td>12&ndash;18 slides</td></tr>
+          <tr><td>over 800 lines</td><td>Ask whether to split the document first</td><td>15&ndash;20 slides</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="callout" style="margin-top: 22px;">
+        <p>
+          <strong>Measured on the reference deck:</strong> 39 headings over 535
+          source lines became <strong>15 slides</strong>. One section's four
+          subsections collapsed into a single slide because they were four facets
+          of one idea; the reference list at the end became zero slides. The ratio
+          is not the point — the judgement is.
+        </p>
+      </div>
+    </section>
+
+    <!-- 06 · DECK CHROME -->
+    <section data-reveal>
+      <div class="sec-head"><span class="sec-num">06</span><h2>What every deck ships with</h2></div>
+      <p class="sec-sub">
+        Load-bearing chrome from the skeleton. The pre-flight checklist greps for
+        each of these by name.
+      </p>
+      <div class="chips">
+        <span class="chip">Top progress bar</span>
+        <span class="chip">Fixed phase header</span>
+        <span class="chip"><code>01 / NN</code> counter</span>
+        <span class="chip">Right-edge dot rail</span>
+        <span class="chip"><code>scroll-snap-type: y mandatory</code></span>
+        <span class="chip"><code>IntersectionObserver</code> tracking</span>
+        <span class="chip">Arrow-key navigation</span>
+        <span class="chip">PageUp / PageDown / Home / End / Space</span>
+        <span class="chip">Per-slide scroll cues</span>
+        <span class="chip">Print-ready, one slide per page</span>
+        <span class="chip"><code>prefers-reduced-motion</code></span>
+        <span class="chip">Visible without JavaScript</span>
+        <span class="chip"><code>aria-labelledby</code> per slide</span>
+        <span class="chip">Snap disabled under 767px</span>
+        <span class="chip">Korean <code>word-break: keep-all</code></span>
+      </div>
+    </section>
+
+    <!-- 07 · CHECKLIST -->
+    <section data-reveal>
+      <div class="sec-head"><span class="sec-num">07</span><h2>Pre-flight checklist</h2></div>
+      <p class="sec-sub">
+        Five groups, verified by inspection of the written file rather than from
+        memory. Most items are a single grep.
+      </p>
+
+      <div class="grid grid-3">
+        <div class="card">
+          <h4 style="font-size:1.05rem;font-weight:700;margin-bottom:8px;">Curation</h4>
+          <p class="text-secondary" style="font-size:0.9rem;">
+            Outline shown before any HTML; 5 to 20 slides matching that outline;
+            narrative beats rather than a heading copy; cuts reported; every slide
+            traceable to source lines; headlines read as a story; one idea per
+            slide; treatments alternate.
+          </p>
+        </div>
+        <div class="card">
+          <h4 style="font-size:1.05rem;font-weight:700;margin-bottom:8px;">Scroll chrome</h4>
+          <p class="text-secondary" style="font-size:0.9rem;">
+            Snap type and align present; dot count equals slide count in the same
+            order; progress bar wired to <code>updateProgress()</code>; counter
+            reads the real total; observer sets the active slide; keys navigate;
+            every slide but the last has a cue pointing at the next one.
+          </p>
+        </div>
+        <div class="card">
+          <h4 style="font-size:1.05rem;font-weight:700;margin-bottom:8px;">Accessibility</h4>
+          <p class="text-secondary" style="font-size:0.9rem;">
+            Reduced-motion media query disables animation; content visible without
+            JS; every slide has <code>aria-labelledby</code> matching its own
+            heading id; <code>&lt;html lang&gt;</code> matches the source; no
+            horizontal overflow at 375px.
+          </p>
+        </div>
+        <div class="card">
+          <h4 style="font-size:1.05rem;font-weight:700;margin-bottom:8px;">Print</h4>
+          <p class="text-secondary" style="font-size:0.9rem;">
+            Snap turned off; progress bar, header, dot rail and cues hidden; every
+            slide breaking onto its own page; reveal animations forced visible;
+            dark slides setting <code>print-color-adjust: exact</code>.
+          </p>
+        </div>
+        <div class="card">
+          <h4 style="font-size:1.05rem;font-weight:700;margin-bottom:8px;">Out of scope</h4>
+          <p class="text-secondary" style="font-size:0.9rem;">
+            Fails if present: a <code>.viz-menu</code> hamburger, a theme toggle or
+            <code>.theme-dark</code> class, PNG export or the
+            <code>html-to-image</code> CDN script, or a base64
+            <code>@font-face</code> the user did not ask for.
+          </p>
+        </div>
+        <div class="card">
+          <h4 style="font-size:1.05rem;font-weight:700;margin-bottom:8px;">The common bug</h4>
+          <p class="text-secondary" style="font-size:0.9rem;">
+            Getting the cue chain off by one. Dot hrefs resolving to real slide
+            ids, and each cue pointing at the <em>next</em> slide rather than any
+            slide, are worth a throwaway script when the deck is long.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 08 · RELATED -->
+    <section data-reveal>
+      <div class="sec-head"><span class="sec-num">08</span><h2>Related skills</h2></div>
+      <p class="sec-sub">The boundary is the deliverable, never the topic.</p>
+
+      <div class="grid grid-2">
+        <div class="card">
+          <h4 style="font-size:1.08rem;font-weight:700;margin-bottom:8px;">visuals:visualize</h4>
+          <p class="text-secondary" style="font-size:0.92rem;">
+            The general-purpose sibling for dashboards, infographics, posters, and
+            horizontal decks. Use it when the output is not a vertical scroll deck
+            — including when the source is too short to be one.
+          </p>
+        </div>
+        <div class="card">
+          <h4 style="font-size:1.08rem;font-weight:700;margin-bottom:8px;">visuals:excalidraw-diagram</h4>
+          <p class="text-secondary" style="font-size:0.92rem;">
+            When the deliverable is a diagram rather than a deck — an
+            <code>.excalidraw</code> file rendered to PNG and audited against a
+            27-item checklist.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <p>Generated from <code>skills/md-to-scrolldeck/SKILL.md</code> · dEitY719 · MIT License</p>
+    </footer>
+
+  </main>
+
+  <script>
+    // === Menu ===
+    function toggleMenu() {
+      var dropdown = document.getElementById('vizMenuDropdown');
+      if (dropdown) dropdown.classList.toggle('open');
+    }
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.viz-menu')) {
+        var dropdown = document.getElementById('vizMenuDropdown');
+        if (dropdown) dropdown.classList.remove('open');
+      }
+    });
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        var dropdown = document.getElementById('vizMenuDropdown');
+        if (dropdown) dropdown.classList.remove('open');
+      }
+    });
+
+    // === Theme (class-based, OS detection on first visit) ===
+    var savedTheme = localStorage.getItem('viz-theme');
+    var currentTheme = savedTheme || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    function applyTheme(t) {
+      document.documentElement.className = 'theme-' + t;
+      document.getElementById('themeIcon').textContent = t === 'dark' ? '🌙' : '☀️';
+      document.getElementById('themeLabel').textContent = t === 'dark' ? 'Dark' : 'Light';
+      localStorage.setItem('viz-theme', t);
+      currentTheme = t;
+    }
+    function cycleTheme() { applyTheme(currentTheme === 'dark' ? 'light' : 'dark'); }
+    applyTheme(currentTheme);
+
+    // === Scroll Reveal (content visible without JS) ===
+    document.querySelectorAll('[data-reveal]').forEach(function(el) { el.classList.add('reveal'); });
+    var revealObserver = new IntersectionObserver(function(entries) {
+      entries.forEach(function(e) { if (e.isIntersecting) { e.target.classList.add('visible'); revealObserver.unobserve(e.target); } });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.reveal').forEach(function(el) { revealObserver.observe(el); });
+
+    // === Copy the invoke command ===
+    var copyResetTimer = 0;
+    function copyInvoke() {
+      var btn = document.getElementById('copyInvoke');
+      var label = document.getElementById('copyInvokeText');
+      var cmd = '/visuals:md-to-scrolldeck';
+      function done() {
+        label.textContent = 'Copied';
+        btn.classList.add('copied');
+        clearTimeout(copyResetTimer);
+        copyResetTimer = setTimeout(function() {
+          label.textContent = cmd;
+          btn.classList.remove('copied');
+        }, 1400);
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(cmd).then(done, fallback);
+      } else { fallback(); }
+      function fallback() {
+        var ta = document.createElement('textarea');
+        ta.value = cmd; ta.setAttribute('readonly', '');
+        ta.style.position = 'absolute'; ta.style.left = '-9999px';
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); done(); } catch(e) { /* clipboard unavailable */ }
+        document.body.removeChild(ta);
+      }
+    }
+
+    // === Download PNG ===
+    async function downloadImage() {
+      var menu = document.querySelector('.viz-menu');
+      menu.style.display = 'none';
+      try {
+        var url = await htmlToImage.toPng(document.body, { quality: 1, pixelRatio: 2, filter: function(n) { return !n.classList || !n.classList.contains('viz-menu'); } });
+        var a = document.createElement('a'); a.href = url;
+        a.download = document.title.replace(/\s+/g, '-').toLowerCase() + '.png'; a.click();
+      } catch(e) { console.error('Download failed:', e); }
+      menu.style.display = '';
+    }
+  </script>
+</body>
+</html>

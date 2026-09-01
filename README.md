@@ -20,6 +20,7 @@ else visual -> `visualize`.
 ### Visual guides and worked examples (GitHub Pages)
 
 - `visualize` — [visual guide](https://deity719.github.io/visuals-skills/skill-guides/visualize.html) · [usage example](https://deity719.github.io/visuals-skills/skill-output/visualize-usage.html) (Markdown to HTML output)
+- `md-to-scrolldeck` — [visual guide](https://deity719.github.io/visuals-skills/skill-guides/md-to-scrolldeck.html) · [usage example](https://deity719.github.io/visuals-skills/skill-output/md-to-scrolldeck-usage.html) (Markdown to vertical scroll deck)
 - `excalidraw-diagram` — [visual guide](https://deity719.github.io/visuals-skills/skill-guides/excalidraw-diagram.html) · [usage example](https://deity719.github.io/visuals-skills/skill-output/excalidraw-diagram-usage.html) (prompt to diagram)
 
 `excalidraw-diagram` also has its own
