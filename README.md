@@ -149,7 +149,8 @@ change there: `skill-check.yml` must grow a `check-emojis` boolean input
 (`required: false`, `default: true`) guarding its emoji step. Once that ships on
 `@main`, this file becomes a `uses:` call passing `plugin-name: visuals` and
 `check-emojis: false`. Until then, a check added to the shared workflow must be
-mirrored here by hand.
+mirrored here by hand. Tracked as
+[harness-skills#2](https://github.com/dEitY719/harness-skills/issues/2).
 
 ## Provenance
 

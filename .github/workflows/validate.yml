@@ -28,6 +28,8 @@ name: validate
 # exists and is released on @main, replace everything below with a `uses:` call
 # passing `plugin-name: visuals` and `check-emojis: false`. Until then, any
 # check added to the shared workflow must be mirrored here by hand.
+#
+# Tracked as dEitY719/harness-skills#2.
 
 on:
   push:

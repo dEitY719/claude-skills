@@ -99,7 +99,8 @@ and `docs/**` ship example HTML — posters, decks, infographics — where emoji
 intentional design glyphs in the rendered artwork, not prose decoration.
 Fifteen tracked files carry them. That is why `.github/workflows/validate.yml`
 omits the shared "No emojis in tracked text" check; see its comment and the
-README's CI section for the follow-up condition.
+README's CI section for the follow-up condition, tracked as
+[harness-skills#2](https://github.com/dEitY719/harness-skills/issues/2).
 
 ## Version bumps
 
