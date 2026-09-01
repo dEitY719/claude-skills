@@ -171,8 +171,9 @@ stay in place until Phase 4 of that repo's migration plan.
 careerhackeralex, `excalidraw-diagram` by
 [coleam00](https://github.com/coleam00/excalidraw-diagram-skill);
 `md-to-scrolldeck` was written by [@dEitY719](https://github.com/dEitY719).
-`.claude-plugin/plugin.json` keeps that authorship split from the maintainer
-field.
+The manifests carry only `author: dEitY719` (the packager) and `license: MIT`,
+because Claude Code's manifest schema rejects any other top-level field, so
+this section is where upstream authorship is recorded.
 
 This is Phase 1 of the dotfiles #1410 migration; `packaging-skills` was Phase 0
 and `harness-skills` is its sibling in this phase.

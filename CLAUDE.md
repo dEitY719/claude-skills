@@ -113,8 +113,18 @@ does not move in lockstep with its siblings.
 
 ## Author and licence attribution
 
-`.claude-plugin/plugin.json` splits `author` (the original skill authors:
-`visualize` by careerhackeralex, `excalidraw-diagram` by coleam00,
-`md-to-scrolldeck` by dEitY719) from `maintainer` (dEitY719, who repackaged
-them). The licence is MIT. That split is a requirement, not a style choice —
-preserve all three fields verbatim through any manifest edit.
+Every manifest carries `author: dEitY719` (the packager) and `license: MIT`,
+and nothing else. A `maintainer` object and a top-level `category` used to sit
+beside them; both are outside Claude Code's plugin manifest schema, which
+accepts only `name`, `version`, `description`, `author`, `homepage`,
+`repository`, `license`, and `keywords` (2.1.x). An unknown top-level key fails
+validation at **load** time — the plugin installs cleanly and then none of its
+skills appear — so they were removed. Do not add them back, and do not add a
+custom `skills` array either; the runtime auto-scans `skills/`.
+
+**Upstream credit therefore lives in prose, not in the manifests.** `visualize`
+is by careerhackeralex, `excalidraw-diagram` by coleam00, `md-to-scrolldeck` by
+dEitY719. Three places carry that attribution and all three are load-bearing:
+`README.md`'s Provenance section, `skills/visualize/SKILL.md`, and
+`skills/excalidraw-diagram/README.md`. Dropping a third-party author's credit
+from any of them is not a formatting change.
