@@ -23,6 +23,10 @@ else visual -> `visualize`.
 - `md-to-scrolldeck` — [visual guide](https://deity719.github.io/visuals-skills/skill-guides/md-to-scrolldeck.html) · [usage example](https://deity719.github.io/visuals-skills/skill-output/md-to-scrolldeck-usage.html) (Markdown to vertical scroll deck)
 - `excalidraw-diagram` — [visual guide](https://deity719.github.io/visuals-skills/skill-guides/excalidraw-diagram.html) · [usage example](https://deity719.github.io/visuals-skills/skill-output/excalidraw-diagram-usage.html) (prompt to diagram)
 
+Both trees are in the repo — [`docs/skill-guides/`](docs/skill-guides) holds the
+rendered skill references, and [`docs/skill-output/`](docs/skill-output) keeps
+each usage example's Markdown source beside its rendered page.
+
 `excalidraw-diagram` also has its own
 [README](skills/excalidraw-diagram/README.md) covering VSCode setup and the
 render pipeline.

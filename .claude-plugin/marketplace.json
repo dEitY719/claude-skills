@@ -1,4 +1,5 @@
 {
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "visuals-skills",
   "description": "Visual-deliverable skills — HTML decks, dashboards and infographics, Markdown-to-scroll-deck conversion, and Excalidraw architecture diagrams",
   "owner": {
@@ -19,7 +20,8 @@
         "name": "dEitY719",
         "url": "https://github.com/dEitY719"
       },
-      "license": "MIT"
+      "license": "MIT",
+      "homepage": "https://github.com/dEitY719/visuals-skills"
     }
   ]
 }
