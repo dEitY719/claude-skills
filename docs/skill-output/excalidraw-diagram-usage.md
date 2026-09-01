@@ -3,7 +3,7 @@
 ## 1. 실행한 명령
 
 ```
-/visuals-excalidraw-diagram docs/skill-output/example.txt
+/visuals:excalidraw-diagram docs/skill-output/example.txt
 ```
 
 ## 2. 입력 프롬프트 (`example.txt`)
