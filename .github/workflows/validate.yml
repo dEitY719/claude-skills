@@ -283,7 +283,7 @@ jobs:
           sys.exit(fail)
           PY
 
-      - name: Shell scripts pass shellcheck (sh:check)
+      - name: Shell scripts pass shellcheck (authoring:sh-check)
         run: |
           set -euo pipefail
           mapfile -t scripts < <(git ls-files '*.sh')

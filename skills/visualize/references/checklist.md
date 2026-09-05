@@ -1,6 +1,17 @@
 # Pre-Flight Checklist — Verify before outputting any visualization
 
-Run through every item before delivering the HTML file.
+Run the shared verifier first, and fix every `[FAIL]` it reports:
+
+```sh
+bash "${CLAUDE_PLUGIN_ROOT}/lib/verify-html.sh" --profile viz <output>.html
+```
+
+It codes the theme-class, CSS-custom-property, menu-function, `@media print`,
+reduced-motion, semantic-landmark, Chart.js and top-level-`var` items below.
+What it cannot see — rendered geometry (375px overflow, minimum sizes),
+behaviour (hover, meaningful interaction, console errors), delivery, and
+content judgement — is why the rest of this list stays. Run through every item
+before delivering the HTML file.
 
 ## Theme & CSS
 
@@ -52,9 +63,7 @@ Run through every item before delivering the HTML file.
 
 ## Output Delivery (Bedrock-safe)
 
-- [ ] HTML written in a single `Write` call (no `Write`-then-`Write` to the same path)?
-- [ ] Assistant reply contains **zero** lines of the generated HTML — no `<head>` excerpt, no `<style>` preview, no code block of the markup? (See [bedrock-safe-write.md](bedrock-safe-write.md) — prevents `Truncated event message received` on AWS Bedrock, issue #690.)
-- [ ] Final reply is summary + `file://` URL + open-command line only?
+- [ ] Every rule in [bedrock-safe-write.md](bedrock-safe-write.md) met — one `Write`, zero HTML echoed into chat, `xdg-open` never `wslview`, reply is summary + `file://` URL + open command? (That file is the owner; do not restate its rules here.)
 
 ---
 

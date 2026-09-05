@@ -51,6 +51,7 @@ instead — `agy` shares `~/.gemini` but not Gemini CLI's tool names.
   session cannot read the rendered image, run the render for the artifact but
   report the visual audit as skipped — never claim 27/27 quality items passed
   without having seen the PNG.
+- **`${CLAUDE_PLUGIN_ROOT}` is not set.** `${CLAUDE_PLUGIN_ROOT}` is a Claude Code variable and is unset here. Wherever a skill writes it — `excalidraw-diagram`'s render command and both HTML skills' `lib/verify-html.sh` call — substitute the directory this plugin was installed into, the one holding `skills/` and `lib/`.
 - **Renderer prerequisites.** That same step shells out to
   `uv run python render_excalidraw.py`, which needs `uv` and a Playwright
   Chromium. Without them, emit `[FAIL] visuals:excalidraw-diagram` at Step 5

@@ -1,28 +1,22 @@
 # Pre-Flight Checklist — verify before reporting the deck done
 
-Run every item. Most are grep-able against the written file, so verify by
-inspection of the file, not from memory. A quick pass:
+Every mechanical item below is coded in the shared verifier — run it first,
+and fix every `[FAIL]` before reading further:
 
 ```sh
-DECK=<output>.html
-# Match on the class attribute, NOT on '<section class="slide' - a formatted
-# file often wraps the attributes onto their own lines and that pattern
-# silently undercounts.
-grep -c 'class="slide[ "]' "$DECK"            # slide count
-grep -c 'class="deck-nav__dot"' "$DECK"       # must equal slide count
-grep -c 'class="next-cue"' "$DECK"            # must equal slide count - 1
-# -E (not BRE '\|'): BSD grep (macOS default) doesn't support '\|' as
-# alternation — always use extended regex for portability here.
-grep -cE 'viz-menu|cycleTheme|toggleMenu|downloadImage|theme-dark' "$DECK"  # must be 0
-grep -cE 'url\("data:font|url\(data:font' "$DECK"   # must be 0 unless user asked
-grep -c 'aria-labelledby=' "$DECK"            # must equal slide count
-grep -nE 'scroll-snap-type: y mandatory|scroll-snap-align: start|scroll-snap-stop: always|IntersectionObserver|ArrowDown|ArrowUp|prefers-reduced-motion|@media print|page-break-after' "$DECK"
+bash "${CLAUDE_PLUGIN_ROOT}/lib/verify-html.sh" --profile deck <output>.html
 ```
 
-Cross-checks a plain `grep` cannot do — dot `href`s resolving to real slide
-ids, and each `.next-cue` pointing at the *next* slide rather than any
-slide — are worth a throwaway script when the deck is long. Getting the
-cue chain off by one is the most common wiring bug.
+It asserts the counts (slides, `.deck-nav__dot`, `aria-labelledby`,
+`.next-cue`), the forbidden patterns (`visualize` chrome, base64 fonts), the
+scroll/print/a11y feature tokens, **and** the two cross-checks a plain `grep`
+cannot do: every dot `href` resolving to a real slide id in slide order, and
+each `.next-cue` pointing at the *next* slide rather than any slide. Getting
+the cue chain off by one is the most common wiring bug and it is the one
+thing a count-only pass will always call `[OK]`.
+
+The remaining items need a human. Verify them by inspection of the file, not
+from memory.
 
 ## Curation
 
@@ -93,12 +87,9 @@ back by copying that skill's skeleton — the omissions are intentional.
 
 ## Delivery
 
-- [ ] Written with a **single** `Write` call (`Edit` for follow-ups, never a
-      second `Write` to the same path)?
-- [ ] **Zero** lines of the generated HTML appear in the chat response — no
-      `<head>` excerpt, no `<style>` preview, no markup code block?
+- [ ] Every rule in [font-and-bedrock-safety.md](font-and-bedrock-safety.md)
+      § 2 met — one `Write`, zero HTML echoed into chat, `xdg-open` never
+      `wslview`, reply is summary + `file://` URL + open command? (That file
+      is the owner; do not restate its rules here.)
 - [ ] Output path is the input's directory + basename with `.html`, unless
       the user specified a path?
-- [ ] Opened with `xdg-open` (Linux/WSL) or `open` (macOS) — never
-      `wslview`?
-- [ ] Final reply is summary + `file://` URL + open-command line only?

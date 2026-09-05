@@ -41,6 +41,7 @@ and points at a single flat `./skills/` directory:
 .agents/plugins/marketplace.json           Antigravity
 gemini-extension.json + GEMINI.md          Gemini CLI
 skills/<name>/SKILL.md                     the skills themselves
+lib/                                       helpers two or more skills share
 docs/                                      GitHub Pages guides and samples
 ```
 
@@ -52,8 +53,8 @@ manifests back under a `plugins/` directory** — CI fails if `plugins/` exists.
 ## Shared assets live in harness-skills, not here
 
 The per-harness tool mappings (`references/{codex,kimi,gemini,antigravity,
-hermes,opencode}-tools.md`) are owned by `dEitY719/harness-skills` (dotfiles
-#1410 F-5). **This repo carries no copy of them.** `GEMINI.md`,
+hermes,opencode}-tools.md`) are owned by `dEitY719/harness-skills`
+(dEitY719/dotfiles#1410 F-5). **This repo carries no copy of them.** `GEMINI.md`,
 `.opencode/INSTALL.md`, and `.kimi-plugin/plugin.json` link to
 `https://github.com/dEitY719/harness-skills/blob/main/references/<harness>-tools.md`
 instead. If you are about to paste one of those files in here, stop and add a
@@ -67,9 +68,11 @@ link — one tool rename must stay one edit across all fifteen repos (NF-2).
   harness supplies the `visuals:` prefix at invocation time. CI hard-fails on a
   `name:` containing a colon.
 - **Invocation form in prose is namespaced.** Body text referring to a skill as
-  a command writes `/visuals:visualize`. The upstream `devx:` forms these skills
-  carried in dotfiles are gone from this repo; a `devx:` string here is a bug
-  unless it names a skill that stayed in dotfiles (e.g. `devx:restart`).
+  a command writes `/visuals:visualize`. The upstream `devx:` forms are gone —
+  `~/dotfiles/claude/skills/` no longer exists, so there is no skill left for a
+  `devx:` string to name. **A `devx:` string in this repo is always a bug, with
+  no exception.** Skills that moved elsewhere in the split take their new repo's
+  namespace: `restart` is now `session:restart` (`dEitY719/session-skills`).
 - **Progressive disclosure.** `SKILL.md` stays under 100 lines (CI enforces it)
   and names which `references/` file to read and when. Detail lives in
   `references/`. Do not inline a reference file back into `SKILL.md`.
@@ -80,7 +83,12 @@ link — one tool rename must stay one edit across all fifteen repos (NF-2).
   `.excalidraw` JSON back into chat — a summary plus a `file://` path only. The
   failure mode this prevents is documented in
   `skills/visualize/references/bedrock-safe-write.md` and
-  `skills/md-to-scrolldeck/references/font-and-bedrock-safety.md`.
+  `skills/md-to-scrolldeck/references/font-and-bedrock-safety.md`. Those two are
+  the **owners** of the rule — two of them on purpose, because the size tables
+  and `Edit`-anchor advice genuinely differ per deliverable. Every other
+  statement of the rule in `references/` is a pointer, never a copy; only each
+  `SKILL.md` keeps a copy, because that is what a model reads on every run. A
+  new delivery detail goes into the owner first.
 - **Never invent data.** Charts, figures, and timelines use the user's real
   content. Placeholder numbers in an output are a defect.
 - **Harness gaps are documented, not worked around silently.** When you add a
@@ -108,7 +116,7 @@ The version appears in seven manifests: `.claude-plugin/marketplace.json`,
 `.claude-plugin/plugin.json`, `.codex-plugin/plugin.json`,
 `.kimi-plugin/plugin.json`, `.hermes-plugin/plugin.yaml`,
 `gemini-extension.json`, and `package.json`. CI checks that they agree — bump
-all of them together. Versioning is independent per repo (#1410 D-9); this repo
+all of them together. Versioning is independent per repo (dEitY719/dotfiles#1410 D-9); this repo
 does not move in lockstep with its siblings.
 
 ## Author and licence attribution

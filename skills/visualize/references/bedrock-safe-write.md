@@ -10,9 +10,9 @@ API Error: Truncated event message received.
 
 The same skill runs fine on the public Anthropic API because that path is
 more lenient. Anyone running Claude Code through Bedrock (e.g. the corporate
-proxy described in `dotfiles` issues #685 / #687 / #688) hits this on any
-non-trivial visualization. The fix is to **stop echoing HTML into chat**,
-not to shrink the visualization.
+proxy described in dEitY719/dotfiles#685, dEitY719/dotfiles#687 and
+dEitY719/dotfiles#688) hits this on any non-trivial visualization. The fix
+is to **stop echoing HTML into chat**, not to shrink the visualization.
 
 ## Hard Rules
 
@@ -30,6 +30,10 @@ not to shrink the visualization.
 4. **Status updates between steps stay terse.** "Reading skeleton",
    "Outlining sections", "Writing file" — one short line each. Do not dump
    intermediate HTML drafts into chat as a thinking aid.
+5. **Open with `xdg-open` (Linux/WSL) or `open` (macOS) — never `wslview`.**
+   `wslview` frequently errors on HTML files; `xdg-open` works reliably on WSL.
+   This is the one detail of the rule that has drifted before, which is why it
+   lives here in the owner document and not only in `SKILL.md`.
 
 ## Size-Aware Strategy
 
@@ -69,7 +73,7 @@ If the user explicitly wants to see what was generated, reply with a
 Never paste the rendered HTML into chat to satisfy this request. Offer to
 open a viewer or render a screenshot instead.
 
-## Reproduction Log (issue #690)
+## Reproduction Log (issue dEitY719/dotfiles#690)
 
 Recorded for future-self search on the error string
 `Truncated event message received`.
@@ -82,7 +86,7 @@ AWS Bedrock.
 | Attempt | Action | Result |
 |---|---|---|
 | 1 | Skill announced `Building /home/.../README.html`, started streaming the file inline | `API Error: Truncated event message received.` — turn aborted before `Write` fired |
-| 2 | `/devx-restart` resumed at the same step with the same approach | Same error, same point — confirming the issue is the streaming payload, not transient flake |
+| 2 | `/session:restart` resumed at the same step with the same approach | Same error, same point — confirming the issue is the streaming payload, not transient flake |
 | 3 | User told the model to skip the inline preview and call `Write` directly | `Write` produced a 644-line `README.html` in one shot, `xdg-open` launched it, no error |
 
 Root cause: the model was emitting the HTML as a long assistant message
