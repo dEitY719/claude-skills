@@ -80,10 +80,8 @@ This skill runs mid-conversation. Use all available context: conversation histor
 
 ## Process
 
-Stop and emit `[FAIL]` rather than guessing: format is ambiguous (run Auto-Recommend from [references/type-rules.md](references/type-rules.md) and wait for confirmation), or [references/skeleton.md](references/skeleton.md) cannot be loaded.
-
-1. **Understand** — message, audience, format. If format unclear, run Auto-Recommend from [references/type-rules.md](references/type-rules.md).
-2. **Start from skeleton** — [references/skeleton.md](references/skeleton.md). NEVER start blank.
+1. **Understand** — message, audience, format. If format unclear, run Auto-Recommend from [references/type-rules.md](references/type-rules.md) and wait for confirmation — never guess a format.
+2. **Start from skeleton** — [references/skeleton.md](references/skeleton.md). NEVER start blank; if it cannot be loaded, stop and emit `[FAIL]`.
 3. **Structure** — outline sections before filling the skeleton.
 4. **Build** — add content, charts, styles. All colors as CSS vars.
 5. **Verify** — `bash "${CLAUDE_PLUGIN_ROOT}/lib/verify-html.sh" --profile viz <out>.html` must exit 0, then the human-judgement items in [references/checklist.md](references/checklist.md).
