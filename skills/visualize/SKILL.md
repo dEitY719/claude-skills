@@ -1,9 +1,9 @@
 ---
 name: visualize
 description: >-
-  Create a self-contained HTML visualization — deck, infographic, dashboard,
-  flowchart, timeline, poster. Use for /visuals:visualize, "visualize this",
-  "make a deck", "이거 시각화해줘". Excalidraw 파일은 visuals:excalidraw-diagram,
+  Create a self-contained HTML file on disk — dashboard, infographic, deck —
+  and open it. Use for /visuals:visualize, "visualize this", "이거 시각화해줘".
+  인챗 차트/Artifact 는 built-in dataviz, Excalidraw 는 visuals:excalidraw-diagram,
   세로 스크롤 덱은 visuals:md-to-scrolldeck.
 license: MIT
 metadata:
@@ -24,8 +24,6 @@ metadata:
 
 If args is `-h`/`--help`/`help`, read `references/help.md` verbatim and stop.
 
-Turn any idea, data, or content into a stunning single-file HTML visualization.
-
 ## After Creating a File
 
 **Always do ALL THREE after writing the HTML file:**
@@ -33,13 +31,16 @@ Turn any idea, data, or content into a stunning single-file HTML visualization.
 2. **Return URL:** Include `file://<absolute-path>` in response.
 3. **Do NOT echo the generated HTML body into chat.** Summary + URL + open command only — no `<head>` preview, no inline excerpt, no rendered code block. The user opens the file via the URL. See [references/bedrock-safe-write.md](references/bedrock-safe-write.md) for the failure mode this prevents (AWS Bedrock `Truncated event message received`).
 
-Example: `Created your visualization! file:///home/user/project/output.html`
+```
+[OK] visuals:visualize type=<dashboard|deck|poster|...> out=<path>
+file://<absolute-path>
+```
+
+On failure: `[FAIL] visuals:visualize step=<n> detail=<reason>`.
 
 ## Critical Requirements
 
 See [references/requirements.md](references/requirements.md) for the full list.
-
-**Copy skeleton → Replace "YOUR CONTENT HERE" → Save file.**
 
 ## Core Principles
 
@@ -69,8 +70,7 @@ Key: Inter font mandatory, class-based theming only, `--bg/--surface/--text/--ac
 
 ## Visualization Types
 
-Choose the right format. For detailed structural patterns, see [references/types.md](references/types.md).
-For type-specific rules (Carousel, Slide Deck, Poster, Auto-Recommend workflow, interactivity requirements, layout variation), see [references/type-rules.md](references/type-rules.md).
+Choose the right format: structural patterns in [references/types.md](references/types.md), type-specific rules (Carousel, Slide Deck, Poster, Auto-Recommend workflow, interactivity, layout variation) in [references/type-rules.md](references/type-rules.md).
 
 When user provides content **without specifying format**: analyze → recommend 1-2 formats → wait for confirmation. See type-rules.md for the content-to-type mapping table.
 
@@ -80,11 +80,13 @@ This skill runs mid-conversation. Use all available context: conversation histor
 
 ## Process
 
+Stop and emit `[FAIL]` rather than guessing: format is ambiguous (run Auto-Recommend from [references/type-rules.md](references/type-rules.md) and wait for confirmation), or [references/skeleton.md](references/skeleton.md) cannot be loaded.
+
 1. **Understand** — message, audience, format. If format unclear, run Auto-Recommend from [references/type-rules.md](references/type-rules.md).
 2. **Start from skeleton** — [references/skeleton.md](references/skeleton.md). NEVER start blank.
 3. **Structure** — outline sections before filling the skeleton.
 4. **Build** — add content, charts, styles. All colors as CSS vars.
-5. **Verify** — run [references/checklist.md](references/checklist.md) before outputting.
+5. **Verify** — `bash "${CLAUDE_PLUGIN_ROOT}/lib/verify-html.sh" --profile viz <out>.html` must exit 0, then the human-judgement items in [references/checklist.md](references/checklist.md).
 
 Chart.js patterns → [references/chartjs-patterns.md](references/chartjs-patterns.md) | Debugging → [references/debugging.md](references/debugging.md) | Bedrock-safe delivery → [references/bedrock-safe-write.md](references/bedrock-safe-write.md)
 

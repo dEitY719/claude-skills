@@ -2,12 +2,12 @@
   {
     "query": "/visuals:md-to-scrolldeck docs/2026-q3-retro.md --slides 12",
     "should_trigger": true,
-    "note": "slash-literal: update if the skill is renamed (#1410)"
+    "note": "slash-literal: update if the skill is renamed (dEitY719/dotfiles#1410)"
   },
   {
     "query": "/visuals:md-to-scrolldeck 돌리기 전에 어떤 장면으로 쪼갤지 목차만 먼저 보고 싶어",
     "should_trigger": true,
-    "note": "slash-literal: update if the skill is renamed (#1410)"
+    "note": "slash-literal: update if the skill is renamed (dEitY719/dotfiles#1410)"
   },
   {
     "query": "내일 본부장 보고인데 docs/roadmap.md 를 그대로 띄우긴 좀 그래. 스크롤 내리면 한 화면에 한 메시지씩 딱 걸리는 형태로 바꿔줄 수 있어?",

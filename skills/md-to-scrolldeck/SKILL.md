@@ -5,6 +5,7 @@ description: >-
   변환한다. Use for /visuals:md-to-scrolldeck, "이 md를
   프레젠테이션으로 만들어줘", "turn this report into slides", 또는 .md 를
   가리키며 슬라이드/덱 요청 시. 대시보드·인포그래픽·가로 덱은 visuals:visualize.
+license: MIT
 allowed-tools: Bash, Read, Edit, Write, Grep, Glob
 metadata:
   version: 0.1.0
@@ -70,10 +71,11 @@ theme toggle, or PNG export — deliberately out of scope here.
 
 Then, in this order: (1) **one `Write` call** for the whole file — see
 `font-and-bedrock-safety.md` § 2 for why one call, no chat echo; (2) run
-`references/checklist.md`'s grep block against the file you just wrote —
-any failure gets fixed and rewritten before you report, never report a
-broken dot rail as `[OK]`; (3) auto-open unless `--no-open` (`xdg-open` on
-Linux/WSL, `open` on macOS — never `wslview`, it errors on HTML).
+`bash "${CLAUDE_PLUGIN_ROOT}/lib/verify-html.sh" --profile deck <out>.html`,
+which must exit 0 — every `[FAIL]` gets fixed and rewritten before you
+report, never report a broken dot rail as `[OK]` — then the judgement items
+in `references/checklist.md`; (3) auto-open unless `--no-open` (`xdg-open`
+on Linux/WSL, `open` on macOS — never `wslview`, it errors on HTML).
 
 Report:
 

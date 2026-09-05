@@ -1,6 +1,7 @@
 ---
 name: excalidraw-diagram
 description: Create Excalidraw diagram JSON files that make visual arguments. Trigger on "/visuals:excalidraw-diagram" or when the user wants to visualize workflows, architectures, or concepts. (인터랙티브 HTML 슬라이드/대시보드는 visuals:visualize 사용)
+license: MIT
 metadata:
   model_recommendation:
     tier: sonnet
@@ -68,13 +69,6 @@ Read `references/output-format.md` for output path rules, filename convention, a
 ### Step 5: Render & Validate (MANDATORY)
 
 Read `references/render-validate.md` for the full render-view-fix loop.
-
-Quick reference:
-```bash
-cd .claude/skills/visuals:excalidraw-diagram/references && uv run python render_excalidraw.py <file.excalidraw>
-```
-
-Render → Read PNG → audit against vision → fix → repeat (2-4 iterations typical).
 
 ### Step 6: Final Quality Check
 

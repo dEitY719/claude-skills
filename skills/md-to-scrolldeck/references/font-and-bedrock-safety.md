@@ -83,6 +83,10 @@ nothing there and make every run faster, so they apply unconditionally.
    blocks of markup.
 4. **Status lines between steps stay terse.** "Outlining", "Writing deck" —
    one short line each. Do not draft HTML in chat as a thinking aid.
+5. **Open with `xdg-open` (Linux/WSL) or `open` (macOS) — never `wslview`.**
+   `wslview` frequently errors on HTML files. This is the one detail of the
+   rule that has drifted before, which is why it lives here in the owner
+   document and not only in `SKILL.md`.
 
 ### Size-aware strategy
 
