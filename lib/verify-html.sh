@@ -11,18 +11,112 @@ set -euo pipefail
 
 usage() {
   printf 'usage: verify-html.sh --profile viz|deck <file.html>\n' >&2
+  printf '       verify-html.sh --selftest\n' >&2
   exit 2
+}
+
+# --selftest: regression cases for the checks that have actually been wrong.
+# No framework on purpose - this repo ships no test runner. Cases 2 and 3 are
+# the PR #24 review finding: a bare "prefers-color-scheme" substring search
+# failed every skeleton-derived file, because the required JS first-visit
+# detection spells it window.matchMedia('(prefers-color-scheme: light)').
+selftest() {
+  local self root tmp fails=0
+  self="$(cd "$(dirname "$0")" && pwd)/$(basename "$0")"
+  root="$(cd "$(dirname "$self")/.." && pwd)"
+  tmp="$(mktemp -d)"
+  # shellcheck disable=SC2064  # expand tmp now, not at trap time
+  trap "rm -rf '$tmp'" EXIT
+
+  expect_line() { # <label> <profile> <file> <expected substring>
+    # Capture first: under `set -o pipefail` a failing checker run would make
+    # the pipeline non-zero even when grep matched.
+    local out
+    out=$(bash "$self" --profile "$2" "$3" 2>&1 || true)
+    if printf '%s\n' "$out" | grep -qF -- "$4"; then
+      printf '[OK] selftest: %s\n' "$1"
+    else
+      printf '[FAIL] selftest: %s -- expected output line: %s\n' "$1" "$4"
+      fails=$((fails + 1))
+    fi
+  }
+  expect_status() { # <label> <expected rc> <args...>
+    local label="$1" want="$2" got=0
+    shift 2
+    bash "$self" "$@" >/dev/null 2>&1 || got=$?
+    if [ "$got" -eq "$want" ]; then
+      printf '[OK] selftest: %s\n' "$label"
+    else
+      printf '[FAIL] selftest: %s -- exit %d, expected %d\n' "$label" "$got" "$want"
+      fails=$((fails + 1))
+    fi
+  }
+
+  # 1. the committed deck fixture is correctly wired end to end
+  if [ -r "$root/docs/skill-output/md-to-scrolldeck-deck.html" ]; then
+    expect_status "deck fixture passes" 0 \
+      --profile deck "$root/docs/skill-output/md-to-scrolldeck-deck.html"
+    # 5. and the cue chain check actually catches an off-by-one
+    sed 's|class="next-cue" href="#pick-rule"|class="next-cue" href="#install"|' \
+      "$root/docs/skill-output/md-to-scrolldeck-deck.html" >"$tmp/bad-deck.html"
+    expect_line "cue chain off-by-one caught" deck "$tmp/bad-deck.html" \
+      "[FAIL] next-cue chain"
+  fi
+
+  # 2. REGRESSION: the required JS OS-preference detection must NOT trip the
+  #    class-based-theming check.
+  cat >"$tmp/js-theme.html" <<'HTML'
+<html class="theme-dark"><body><main id="main-content">x</main>
+<style>.theme-light{color:#000}</style>
+<script>var t = window.matchMedia('(prefers-color-scheme: light)').matches;</script>
+</body></html>
+HTML
+  expect_line "JS matchMedia allowed" viz "$tmp/js-theme.html" \
+    "[OK] no @media prefers-color-scheme"
+
+  # 3. a real CSS media query still fails
+  cat >"$tmp/css-theme.html" <<'HTML'
+<html class="theme-dark"><body><main id="main-content">x</main>
+<style>.theme-light{color:#000}
+@media (prefers-color-scheme: dark){:root{--bg:#000}}</style>
+</body></html>
+HTML
+  expect_line "CSS @media prefers-color-scheme rejected" viz "$tmp/css-theme.html" \
+    "[FAIL] no @media prefers-color-scheme"
+
+  # 4. the id alone must not satisfy the <main> landmark
+  cat >"$tmp/no-main.html" <<'HTML'
+<html class="theme-dark"><body><a href="#main-content">skip</a>
+<div id="main-content">x</div><style>.theme-light{color:#000}</style></body></html>
+HTML
+  expect_line "skip-link target is not a landmark" viz "$tmp/no-main.html" \
+    '[FAIL] <main id="main-content">'
+
+  # 6. usage errors
+  expect_status "bad profile exits 2" 2 --profile bogus "$tmp/js-theme.html"
+  expect_status "missing file exits 2" 2 --profile viz "$tmp/nope.html"
+
+  if [ "$fails" -eq 0 ]; then
+    printf '[OK] verify-html selftest: all cases passed\n'
+    exit 0
+  fi
+  printf '[FAIL] verify-html selftest: %d case(s) failed\n' "$fails"
+  exit 1
 }
 
 PROFILE=""
 FILE=""
+SELFTEST=0
 while [ $# -gt 0 ]; do
   case "$1" in
     --profile) [ $# -ge 2 ] || usage; PROFILE="$2"; shift 2 ;;
+    --selftest) SELFTEST=1; shift ;;
     -*) usage ;;
     *) [ -z "$FILE" ] || usage; FILE="$1"; shift ;;
   esac
 done
+
+[ "$SELFTEST" -eq 1 ] && selftest
 
 case "$PROFILE" in viz|deck) ;; *) usage ;; esac
 [ -n "$FILE" ] || usage
@@ -67,12 +161,16 @@ check_viz() {
     bad "theme classes" "missing:$miss"
   fi
 
-  # Theming is class-based only; a media query defeats the manual toggle.
-  n=$(count_lines 'prefers-color-scheme')
+  # Theming is class-based only; a CSS media query defeats the manual toggle.
+  # Scoped to the at-rule: the JS first-visit detection
+  # window.matchMedia('(prefers-color-scheme: light)') is REQUIRED by
+  # checklist.md and must not trip this. See selftest cases 2 and 3.
+  n=$(count_lines_re '@media[^{]*prefers-color-scheme')
   if [ "$n" -eq 0 ]; then
-    ok "no prefers-color-scheme"
+    ok "no @media prefers-color-scheme"
   else
-    bad "no prefers-color-scheme" "$n line(s) use it; theming must be class-based"
+    bad "no @media prefers-color-scheme" \
+      "$n CSS media quer(y|ies) theme by OS; theming must be class-based"
   fi
 
   present "viz-menu" '.viz-menu'
@@ -81,9 +179,15 @@ check_viz() {
   present "downloadImage()" 'downloadImage('
   present "@media print" '@media print'
   present "@media (prefers-reduced-motion)" '@media (prefers-reduced-motion'
-  # Attribute order varies; the skip-link spells it href="#main-content", so a
-  # plain search for the id attribute cannot false-positive on it.
-  present "<main id=main-content>" 'id="main-content"'
+  # Attribute order varies and the open tag may wrap, so flatten to one tag per
+  # line before matching. Requiring the <main> tag itself, not just the id,
+  # keeps the skip-link target href="#main-content" from satisfying the landmark.
+  if tr '\n' ' ' <"$FILE" | sed 's/</\n</g' |
+     grep -qE '^<main[[:space:]][^>]*id="main-content"'; then
+    ok '<main id="main-content">'
+  else
+    bad '<main id="main-content">' 'no <main> element carrying id="main-content"'
+  fi
 
   # Match declarations ("--text:") so --text-secondary: cannot satisfy --text.
   miss=""

@@ -283,6 +283,15 @@ jobs:
           sys.exit(fail)
           PY
 
+      - name: Shared lib self-test
+        run: |
+          set -euo pipefail
+          if [ -x /bin/bash ] && [ -f lib/verify-html.sh ]; then
+            bash lib/verify-html.sh --selftest
+          else
+            echo "ok    no lib/verify-html.sh — nothing to self-test"
+          fi
+
       - name: Shell scripts pass shellcheck (authoring:sh-check)
         run: |
           set -euo pipefail
