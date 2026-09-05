@@ -6,16 +6,13 @@ Run the shared verifier first, and fix every `[FAIL]` it reports:
 bash "${CLAUDE_PLUGIN_ROOT}/lib/verify-html.sh" --profile viz <output>.html
 ```
 
-It codes the theme-class, CSS-custom-property, menu-function, `@media print`,
-reduced-motion, semantic-landmark, Chart.js and top-level-`var` items below.
-What it cannot see — rendered geometry (375px overflow, minimum sizes),
-behaviour (hover, meaningful interaction, console errors), delivery, and
-content judgement — is why the rest of this list stays. Run through every item
-before delivering the HTML file.
+It codes the mechanical items and prints its own labels. What it cannot see —
+rendered geometry (375px overflow, minimum sizes), behaviour (hover, meaningful
+interaction, console errors), delivery, and content judgement — is why the rest
+of this list stays. Run through every item before delivering the HTML file.
 
 ## Theme & CSS
 
-- [ ] `html.theme-dark` and `html.theme-light` class-based theme selectors defined (NO `@media prefers-color-scheme`)?
 - [ ] JS detects OS preference on first visit, stores in `localStorage`?
 - [ ] All text uses `var(--text)` or `var(--text-secondary)`?
 - [ ] Hero/title text visible on BOTH dark (`#030712`) and light (`#f8fafc`) backgrounds?
@@ -26,7 +23,6 @@ before delivering the HTML file.
 
 - [ ] No horizontal overflow at 375px viewport width?
 - [ ] `@media print` hides menu, shows all content?
-- [ ] `@media (prefers-reduced-motion: reduce)` present?
 - [ ] Minimum sizing rules followed — cards ≥280px, body text ≥16px, sections ≥48px spacing? (see [sizing-rules.md](sizing-rules.md))
 
 ## Menu & Interactions
@@ -43,7 +39,6 @@ before delivering the HTML file.
 
 ## JavaScript
 
-- [ ] All top-level JS variables use `var` (not `let`/`const`)?
 - [ ] `cycleTheme()` function exists and changes html class?
 - [ ] `toggleMenu()` function exists and closes on outside clicks?
 
@@ -63,7 +58,7 @@ before delivering the HTML file.
 
 ## Output Delivery (Bedrock-safe)
 
-- [ ] Every rule in [bedrock-safe-write.md](bedrock-safe-write.md) met — one `Write`, zero HTML echoed into chat, `xdg-open` never `wslview`, reply is summary + `file://` URL + open command? (That file is the owner; do not restate its rules here.)
+- [ ] Every rule in [bedrock-safe-write.md](bedrock-safe-write.md) § Hard Rules met? (That file is the owner; do not restate its rules here.)
 
 ---
 

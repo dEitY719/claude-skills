@@ -7,9 +7,7 @@ and fix every `[FAIL]` before reading further:
 bash "${CLAUDE_PLUGIN_ROOT}/lib/verify-html.sh" --profile deck <output>.html
 ```
 
-It asserts the counts (slides, `.deck-nav__dot`, `aria-labelledby`,
-`.next-cue`), the forbidden patterns (`visualize` chrome, base64 fonts), the
-scroll/print/a11y feature tokens, **and** the two cross-checks a plain `grep`
+It prints its own labels, and it covers the two cross-checks a plain `grep`
 cannot do: every dot `href` resolving to a real slide id in slide order, and
 each `.next-cue` pointing at the *next* slide rather than any slide. Getting
 the cue chain off by one is the most common wiring bug and it is the one
@@ -35,8 +33,6 @@ from memory.
 
 - [ ] `scroll-snap-type: y mandatory` on `html`, and
       `scroll-snap-align: start` + `scroll-snap-stop: always` on `.slide`?
-- [ ] `.deck-nav__dot` count equals `.slide` count, in the same order, and
-      every `href="#id"` resolves to an existing slide id?
 - [ ] `.progress__bar` present and wired — `updateProgress()` sets its
       `scaleX` from scroll position, on `scroll` and `resize`?
 - [ ] `.deck-header` counter reads `01 / NN` with the real slide count, and
@@ -46,8 +42,6 @@ from memory.
 - [ ] `ArrowDown` / `ArrowUp` (plus PageDown/PageUp/Home/End/Space) call
       `goTo()`, and `goTo()` uses `scrollIntoView` with
       `behavior: reduceMotion ? "auto" : "smooth"`?
-- [ ] Every slide except the last has a `.next-cue` pointing at the next
-      slide's id, and the last slide has none?
 
 ## Accessibility and resilience
 
@@ -88,8 +82,6 @@ back by copying that skill's skeleton — the omissions are intentional.
 ## Delivery
 
 - [ ] Every rule in [font-and-bedrock-safety.md](font-and-bedrock-safety.md)
-      § 2 met — one `Write`, zero HTML echoed into chat, `xdg-open` never
-      `wslview`, reply is summary + `file://` URL + open command? (That file
-      is the owner; do not restate its rules here.)
+      § 2 met? (That file is the owner; do not restate its rules here.)
 - [ ] Output path is the input's directory + basename with `.html`, unless
       the user specified a path?

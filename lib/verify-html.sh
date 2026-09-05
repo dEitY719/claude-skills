@@ -106,17 +106,14 @@ HTML
 
 PROFILE=""
 FILE=""
-SELFTEST=0
 while [ $# -gt 0 ]; do
   case "$1" in
     --profile) [ $# -ge 2 ] || usage; PROFILE="$2"; shift 2 ;;
-    --selftest) SELFTEST=1; shift ;;
+    --selftest) selftest ;;  # never returns
     -*) usage ;;
     *) [ -z "$FILE" ] || usage; FILE="$1"; shift ;;
   esac
 done
-
-[ "$SELFTEST" -eq 1 ] && selftest
 
 case "$PROFILE" in viz|deck) ;; *) usage ;; esac
 [ -n "$FILE" ] || usage
@@ -131,33 +128,36 @@ ok()  { printf '[OK] %s\n' "$1"; PASSED=$((PASSED + 1)); }
 bad() { printf '[FAIL] %s: %s\n' "$1" "$2"; FAILED=$((FAILED + 1)); }
 
 # grep -c exits 1 when the count is 0, which set -e would treat as fatal.
-count_lines() { local n; n=$(grep -cF -- "$1" "$FILE" || true); printf '%s\n' "${n:-0}"; }
-count_lines_re() { local n; n=$(grep -cE -- "$1" "$FILE" || true); printf '%s\n' "${n:-0}"; }
+count_lines() { grep -cF -- "$1" "$FILE" || true; }
+count_lines_re() { grep -cE -- "$1" "$FILE" || true; }
 # -o counts occurrences rather than lines; grep -c cannot do that.
 count_hits() {
   local n
   n=$(grep -oF -- "$1" "$FILE" | wc -l | tr -d '[:space:]' || true)
   printf '%s\n' "${n:-0}"
 }
-# present <label> <fixed-string>; count_eq <label> <fixed-string> <expected-lines>
+# One tag per line: a formatted file wraps a tag's attributes across several
+# lines, so ids and hrefs must be read from the tag, not from a line.
+flatten_tags() { tr '\n' ' ' <"$FILE" | sed 's/</\n</g'; }
+# present <label> <fixed-string>
 present() { if grep -qF -- "$2" "$FILE"; then ok "$1"; else bad "$1" "'$2' not found"; fi; }
+# count_eq <label> <fixed-string> <expected-lines> <why-that-many>
 count_eq() {
   local got
   got=$(count_lines "$2")
-  if [ "$got" -eq "$3" ]; then ok "$1 ($got)"; else bad "$1" "$got, expected $3 (one per slide)"; fi
+  if [ "$got" -eq "$3" ]; then ok "$1 ($got)"; else bad "$1" "$got, expected $3 ($4)"; fi
 }
 
 check_viz() {
-  local miss n p dark light hits canvases imgroles
+  local miss n p hits canvases imgroles
 
-  dark=$(count_lines 'theme-dark')
-  light=$(count_lines 'theme-light')
-  if [ "$dark" -gt 0 ] && [ "$light" -gt 0 ]; then
+  miss=""
+  for p in theme-dark theme-light; do
+    grep -qF -- "$p" "$FILE" || miss="$miss $p"
+  done
+  if [ -z "$miss" ]; then
     ok "theme classes"
   else
-    miss=""
-    [ "$dark" -gt 0 ] || miss="$miss theme-dark"
-    [ "$light" -gt 0 ] || miss="$miss theme-light"
     bad "theme classes" "missing:$miss"
   fi
 
@@ -179,11 +179,9 @@ check_viz() {
   present "downloadImage()" 'downloadImage('
   present "@media print" '@media print'
   present "@media (prefers-reduced-motion)" '@media (prefers-reduced-motion'
-  # Attribute order varies and the open tag may wrap, so flatten to one tag per
-  # line before matching. Requiring the <main> tag itself, not just the id,
-  # keeps the skip-link target href="#main-content" from satisfying the landmark.
-  if tr '\n' ' ' <"$FILE" | sed 's/</\n</g' |
-     grep -qE '^<main[[:space:]][^>]*id="main-content"'; then
+  # Requiring the <main> tag itself, not just the id, keeps the skip-link
+  # target href="#main-content" from satisfying the landmark.
+  if flatten_tags | grep -qE '^<main[[:space:]][^>]*id="main-content"'; then
     ok '<main id="main-content">'
   else
     bad '<main id="main-content">' 'no <main> element carrying id="main-content"'
@@ -201,7 +199,7 @@ check_viz() {
     bad "css custom properties" "missing:$miss"
   fi
 
-  if [ "$(count_lines 'Chart')" -eq 0 ]; then
+  if ! grep -qF -- 'Chart' "$FILE"; then
     ok "charts: none present (skipped)"
   else
     if grep -qE 'Chart\.defaults\.animation[[:space:]]*=[[:space:]]*false' "$FILE"; then
@@ -236,7 +234,7 @@ check_viz() {
 }
 
 check_deck() {
-  local n slides dots cues flat miss tok want got i unresolved
+  local n slides dots cues flat miss tok want got i unresolved cue_ids slide_ids
 
   # Match on the class attribute, NOT on '<section class="slide' - a formatted
   # file wraps the attributes onto their own lines and that pattern undercounts.
@@ -247,17 +245,13 @@ check_deck() {
     bad "slide count" "no elements with class=\"slide\"; every count below is vacuous"
   fi
 
-  count_eq "nav dot count" 'class="deck-nav__dot"' "$n"
-  count_eq "aria-labelledby count" 'aria-labelledby=' "$n"
+  count_eq "nav dot count" 'class="deck-nav__dot"' "$n" "one per slide"
+  count_eq "aria-labelledby count" 'aria-labelledby=' "$n" "one per slide"
 
   want=$((n - 1))
   [ "$want" -ge 0 ] || want=0
-  got=$(count_lines 'class="next-cue"')
-  if [ "$got" -eq "$want" ]; then
-    ok "next-cue count ($got)"
-  else
-    bad "next-cue count" "$got, expected $want (slides - 1; the last slide has none)"
-  fi
+  count_eq "next-cue count" 'class="next-cue"' "$want" \
+    "slides - 1; the last slide has none"
 
   # These belong to the sibling visualize skill and are deliberately out of
   # scope here - the deck is one designed theme, not a themeable page.
@@ -290,9 +284,7 @@ check_deck() {
     bad "scroll/print/a11y features" "missing:$miss"
   fi
 
-  # Flatten to one tag per line: the real fixture wraps a <section>'s attributes
-  # across several lines, so ids and hrefs must be read from the tag, not a line.
-  flat=$(tr '\n' ' ' < "$FILE" | sed 's/</\n</g')
+  flat=$(flatten_tags)
   slides=$(grep 'class="slide[ "]' <<<"$flat" | sed -n 's/.*[[:space:]]id="\([^"]*\)".*/\1/p' || true)
   dots=$(grep 'class="deck-nav__dot"' <<<"$flat" | sed -n 's/.*href="#\([^"]*\)".*/\1/p' || true)
   cues=$(grep 'class="next-cue"' <<<"$flat" | sed -n 's/.*href="#\([^"]*\)".*/\1/p' || true)
@@ -316,11 +308,16 @@ check_deck() {
 
   # Slide k's cue must point at slide k+1. An off-by-one cue chain is the most
   # common wiring bug in a hand-edited deck, which is why this check exists.
+  # Read both lists into arrays once: indexing them beats respawning sed per
+  # slide. Plain `read` loops, not mapfile - this must run on macOS bash 3.2.
+  cue_ids=(); slide_ids=()
+  while IFS= read -r tok; do cue_ids+=("$tok"); done <<<"$cues"
+  while IFS= read -r tok; do slide_ids+=("$tok"); done <<<"$slides"
   miss=""
   i=1
   while [ "$i" -lt "$n" ]; do
-    got=$(sed -n "${i}p" <<<"$cues")
-    want=$(sed -n "$((i + 1))p" <<<"$slides")
+    got=${cue_ids[i - 1]-}
+    want=${slide_ids[i]-}
     if [ "$got" != "$want" ]; then
       miss="slide $i cue points at '#$got', expected '#$want'"
       break

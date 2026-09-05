@@ -59,7 +59,7 @@ writing any HTML.
 
 Copy `references/scroll-deck-skeleton.md` and replace its `YOUR ... HERE`
 tokens — **never write this HTML from scratch**. The chrome is load-bearing and
-the checklist greps for it: top progress bar, fixed phase header with an
+the verifier checks for it: top progress bar, fixed phase header with an
 `01 / NN` counter, right-edge dot rail, `scroll-snap-type: y mandatory` slides
 tracked by `IntersectionObserver`, arrow-key navigation, print-ready output.
 
