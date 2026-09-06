@@ -118,12 +118,14 @@ link — one tool rename must stay one edit across all fifteen repos (NF-2).
 No emojis in `README.md`, `CLAUDE.md`, `GEMINI.md`, any manifest, or any
 `SKILL.md` — token efficiency.
 
-**The one exception is vendored visual output.** `skills/visualize/examples/*`
-and `docs/**` ship example HTML — posters, decks, infographics — where emoji are
-intentional design glyphs in the rendered artwork, not prose decoration.
-`.github/workflows/validate.yml` exempts those two trees from the shared
-"No emojis in tracked text" check via the reusable workflow's
-`allow-emoji-paths` input; see its comment and the README's CI section.
+**The one exception is vendored visual output.** `skills/visualize/examples/*`,
+`skills/visualize/references/skeleton.md`, and `docs/**` ship example HTML —
+posters, decks, infographics — where emoji are intentional design glyphs in the
+rendered artwork, not prose decoration. `.github/workflows/validate.yml` exempts
+exactly those paths from the shared "No emojis in tracked text" check via the
+reusable workflow's `allow-emoji-paths` input; `skills/visualize/SKILL.md` and
+the other reference files stay under the ban. See its comment and the README's
+CI section.
 Originally tracked as
 [harness-skills#2](https://github.com/dEitY719/harness-skills/issues/2).
 

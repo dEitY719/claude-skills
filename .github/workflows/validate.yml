@@ -32,4 +32,11 @@ jobs:
     uses: dEitY719/harness-skills/.github/workflows/skill-check.yml@main
     with:
       plugin-name: visuals
-      allow-emoji-paths: skills/visualize/,docs/
+      # Narrow to the vendored visual output CLAUDE.md names, plus the one
+      # skeleton that carries the same rendered glyphs. `skills/visualize/`
+      # wholesale would also unguard SKILL.md and every prose reference,
+      # which is where an accidental emoji actually needs catching.
+      allow-emoji-paths: |
+        skills/visualize/examples/
+        skills/visualize/references/skeleton.md
+        docs/
