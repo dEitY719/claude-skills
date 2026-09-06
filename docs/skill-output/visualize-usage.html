@@ -75,10 +75,11 @@
     .card {
       background: var(--surface); border: 1px solid var(--border);
       border-radius: 14px; padding: 28px;
-      transition: box-shadow 0.2s ease;
+      transition: box-shadow 0.2s ease, border-color 0.2s ease;
     }
     .card:hover {
       box-shadow: 0 0 0 1px var(--border), 0 12px 28px rgba(0,0,0,0.10);
+      border-color: color-mix(in srgb, var(--accent) 30%, var(--border));
     }
 
     /* ===== FLOW DIAGRAM ===== */
