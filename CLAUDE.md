@@ -89,6 +89,16 @@ link — one tool rename must stay one edit across all fifteen repos (NF-2).
   statement of the rule in `references/` is a pointer, never a copy; only each
   `SKILL.md` keeps a copy, because that is what a model reads on every run. A
   new delivery detail goes into the owner first.
+- **`docs/skill-guides/<skill>.html` has no Markdown source, on purpose.** Each
+  guide page is `skills/<skill>/SKILL.md` rendered directly by
+  `/visuals:visualize`; every page's footer names that source path. **Do not add
+  a `docs/skill-guides/<skill>.md`** — it would duplicate `SKILL.md`, and the
+  original, the copy, and the HTML would then drift apart. To refresh a guide,
+  re-render its `SKILL.md`.
+- **`docs/skill-output/<skill>-usage.{md,html}` keeps both files.** These are
+  records of one real run: the `.md` is the source, the `.html` is that source
+  rendered. Losing either one breaks the pair. `README.md` links a guide **and**
+  a usage example per skill; keep both links when you add a skill.
 - **Never invent data.** Charts, figures, and timelines use the user's real
   content. Placeholder numbers in an output are a defect.
 - **Harness gaps are documented, not worked around silently.** When you add a
