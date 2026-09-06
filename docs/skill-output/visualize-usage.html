@@ -205,7 +205,8 @@
     /* ===== PRINT ===== */
     @media print {
       body { background: white !important; color: black !important; }
-      .viz-menu, .reveal { display: revert; opacity: 1 !important; transform: none !important; }
+      .viz-menu, .skip-to-content { display: none !important; }
+      .reveal { opacity: 1 !important; transform: none !important; }
       .card, .flow-node { break-inside: avoid; border: 1px solid #ddd; box-shadow: none; }
       * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
     }

@@ -48,7 +48,7 @@
     code, .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
     a { color: var(--accent); }
 
-    main#page { max-width: 1140px; margin: 0 auto; padding: 0 24px 100px; }
+    main#main-content { max-width: 1140px; margin: 0 auto; padding: 0 24px 100px; }
     section { padding: 56px 0 8px; }
 
     /* ===== HERO ===== */
@@ -78,7 +78,7 @@
       border-radius: 14px; padding: 24px;
       transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
     }
-    .card:hover { box-shadow: 0 0 0 1px var(--border), 0 12px 28px rgba(0,0,0,0.10); transform: translateY(-3px); }
+    .card:hover { box-shadow: 0 0 0 1px var(--border), 0 12px 28px rgba(0,0,0,0.10); border-color: color-mix(in srgb, var(--accent) 30%, var(--border)); }
 
     .grid { display: grid; gap: 18px; }
     .grid-2 { grid-template-columns: repeat(2, 1fr); }
@@ -156,7 +156,8 @@
     /* ===== PRINT ===== */
     @media print {
       body { background: white !important; color: black !important; }
-      .viz-menu, .reveal { display: revert; opacity: 1 !important; transform: none !important; }
+      .viz-menu, .skip-to-content { display: none !important; }
+      .reveal { opacity: 1 !important; transform: none !important; }
       .card, .rule-list li { break-inside: avoid; border: 1px solid #ddd; box-shadow: none; }
       * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
     }
@@ -193,8 +194,6 @@
   <a href="#main-content" class="skip-to-content">Skip to content</a>
 
   <main id="main-content" role="main">
-  <div id="page-wrap">
-  <main id="page">
 
     <!-- HERO -->
     <header class="hero">
@@ -412,8 +411,6 @@
       <p>Generated from <code>skills/visualize/SKILL.md</code> · careerhackeralex · MIT License</p>
     </footer>
 
-  </main>
-  </div>
   </main>
 
   <script>
