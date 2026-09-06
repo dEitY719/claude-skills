@@ -134,27 +134,25 @@ a migration later.
 
 ## CI
 
-[`.github/workflows/validate.yml`](.github/workflows/validate.yml) validates
-manifests, skill frontmatter, progressive-disclosure line limits, the Codex
-description budget, version agreement across all seven version-bearing
+[`.github/workflows/validate.yml`](.github/workflows/validate.yml) is a `uses:`
+call to
+[`harness-skills/.github/workflows/skill-check.yml`](https://github.com/dEitY719/harness-skills/blob/main/.github/workflows/skill-check.yml),
+the same reusable workflow every other `dEitY719/*-skills` repo validates
+through — manifests, skill frontmatter, progressive-disclosure line limits, the
+Codex description budget, version agreement across all seven version-bearing
 manifests, plugin-name consistency, the `AGENTS.md` symlink, the flat layout,
 and shell scripts.
 
-**It is self-contained rather than a call to the shared reusable workflow, on
-purpose.** Every other `dEitY719/*-skills` repo validates through
-[`harness-skills/.github/workflows/skill-check.yml`](https://github.com/dEitY719/harness-skills/blob/main/.github/workflows/skill-check.yml).
-That workflow includes a "No emojis in tracked text" check, and this repo's
-`visualize` skill ships example HTML — posters, decks, infographics — that uses
-emoji as intentional design glyphs in the rendered artwork. Fifteen tracked
-files carry them. The shared check is structurally incompatible here, not merely
-inconvenient, so `validate.yml` inlines every other check and omits that one.
-
-Converting to the shared workflow (dotfiles #1410 D-10) is gated on one concrete
-change there: `skill-check.yml` must grow a `check-emojis` boolean input
-(`required: false`, `default: true`) guarding its emoji step. Once that ships on
-`@main`, this file becomes a `uses:` call passing `plugin-name: visuals` and
-`check-emojis: false`. Until then, a check added to the shared workflow must be
-mirrored here by hand. Tracked as
+That shared workflow bans emoji in tracked text, and this repo's `visualize`
+skill ships example HTML — posters, decks, infographics — that uses emoji as
+intentional design glyphs in the rendered artwork. `validate.yml` exempts
+those trees with the workflow's `allow-emoji-paths` input
+(`skills/visualize/,docs/`) rather than inlining every other check to omit
+just that one. The repo-specific `lib/verify-html.sh --selftest` check — not
+part of the shared workflow — runs via the `tests/*.sh` convention the shared
+workflow auto-discovers; see
+[`tests/verify-html-selftest.sh`](tests/verify-html-selftest.sh). Originally
+tracked as
 [harness-skills#2](https://github.com/dEitY719/harness-skills/issues/2).
 
 ## Provenance
