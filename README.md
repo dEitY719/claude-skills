@@ -146,9 +146,8 @@ and shell scripts.
 That shared workflow bans emoji in tracked text, and this repo's `visualize`
 skill ships example HTML — posters, decks, infographics — that uses emoji as
 intentional design glyphs in the rendered artwork. `validate.yml` exempts
-those trees with the workflow's `allow-emoji-paths` input
-(`skills/visualize/,docs/`) rather than inlining every other check to omit
-just that one. The repo-specific `lib/verify-html.sh --selftest` check — not
+exactly those paths with the workflow's `allow-emoji-paths` input rather than
+inlining every other check to omit just that one. The repo-specific `lib/verify-html.sh --selftest` check — not
 part of the shared workflow — runs via the `tests/*.sh` convention the shared
 workflow auto-discovers; see
 [`tests/verify-html-selftest.sh`](tests/verify-html-selftest.sh). Originally
