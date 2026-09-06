@@ -94,10 +94,16 @@ link — one tool rename must stay one edit across all fifteen repos (NF-2).
   `/visuals:visualize`; every page's footer names that source path. **Do not add
   a `docs/skill-guides/<skill>.md`** — it would duplicate `SKILL.md`, and the
   original, the copy, and the HTML would then drift apart. To refresh a guide,
-  re-render its `SKILL.md`.
+  re-render its `SKILL.md` through `/visuals:visualize` again — not generic
+  markdown-to-HTML tooling, so the same rendering conventions apply. That
+  re-render is an LLM call, not a deterministic build step, so there is no
+  automated staleness check; the footer's named source path is the only
+  freshness signal — re-render whenever `SKILL.md` changes underneath it.
 - **`docs/skill-output/<skill>-usage.{md,html}` keeps both files.** These are
-  records of one real run: the `.md` is the source, the `.html` is that source
-  rendered. Losing either one breaks the pair. `README.md` links a guide **and**
+  records of one real run: the `.md` is the source, the `.html` is that
+  source rendered by `/visuals:visualize` — the same tool and rule as
+  `skill-guides` above, regardless of which skill the run demonstrates.
+  Losing either one breaks the pair. `README.md` links a guide **and**
   a usage example per skill; keep both links when you add a skill.
 - **Never invent data.** Charts, figures, and timelines use the user's real
   content. Placeholder numbers in an output are a defect.
